@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="ojdbc14가 ojdbc8을 가려 ORA-28040을 일으킨 사건으로 배우는 Maven 좌표·스코프·전이·중재·클래스로딩">
+<title>두 개의 OracleDriver</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+
+<style>
+  :root {
+    --ground:    #F5F7F8;
+    --surface:   #FFFFFF;
+    --surface-2: #EDF1F3;
+    --line:      #D5DEE2;
+    --line-soft: #E5EBEE;
+    --ink:       #16232A;
+    --ink-2:     #47585F;
+    --ink-3:     #6E8189;
+    --accent:    #1B5E77;
+    --accent-bg: #E3EEF3;
+    --tarnish:   #8A6D2F;
+    --tarnish-bg:#F2EBDA;
+    --danger:    #A8331F;
+    --danger-bg: #F7E6E2;
+    --ok:        #1F6B4F;
+    --ok-bg:     #E2EFE9;
+    --shadow: 0 1px 2px rgba(22,35,42,.05), 0 8px 24px -16px rgba(22,35,42,.28);
+
+    --sans: "IBM Plex Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:    #0D1418;
+      --surface:   #141E23;
+      --surface-2: #1B272D;
+      --line:      #2B3A42;
+      --line-soft: #223038;
+      --ink:       #E3EBEE;
+      --ink-2:     #AFC0C7;
+      --ink-3:     #839299;
+      --accent:    #6FBBDA;
+      --accent-bg: #13303C;
+      --tarnish:   #CFA654;
+      --tarnish-bg:#312813;
+      --danger:    #EE8570;
+      --danger-bg: #3A1C16;
+      --ok:        #58C598;
+      --ok-bg:     #123024;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:    #0D1418;
+    --surface:   #141E23;
+    --surface-2: #1B272D;
+    --line:      #2B3A42;
+    --line-soft: #223038;
+    --ink:       #E3EBEE;
+    --ink-2:     #AFC0C7;
+    --ink-3:     #839299;
+    --accent:    #6FBBDA;
+    --accent-bg: #13303C;
+    --tarnish:   #CFA654;
+    --tarnish-bg:#312813;
+    --danger:    #EE8570;
+    --danger-bg: #3A1C16;
+    --ok:        #58C598;
+    --ok-bg:     #123024;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 120px;
+  }
+
+  @media (min-width: 1000px) {
+    .shell {
+      grid-template-columns: 210px minmax(0, 1fr);
+      gap: 64px;
+      padding: 0 32px 140px;
+    }
+  }
+
+  /* ---------- 목차 ---------- */
+  .toc { display: none; }
+
+  @media (min-width: 1000px) {
+    .toc {
+      display: block;
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100vh;
+      overflow-y: auto;
+      padding: 96px 0 40px;
+    }
+  }
+
+  .toc-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 16px;
+  }
+
+  .toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    counter-reset: toc;
+  }
+
+  .toc a {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 6px;
+    color: var(--ink-2);
+    text-decoration: none;
+    font-size: 13.5px;
+    line-height: 1.45;
+    border-left: 2px solid transparent;
+    padding-left: 10px;
+    margin-left: -12px;
+    transition: color .15s, border-color .15s;
+  }
+
+  .toc a::before {
+    counter-increment: toc;
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    padding-top: 2px;
+  }
+
+  .toc a:hover,
+  .toc a:focus-visible { color: var(--accent); border-left-color: var(--accent); }
+
+  /* ---------- 본문 ---------- */
+  .doc { min-width: 0; max-width: 72ch; padding-top: 88px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+
+  h1 {
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1.16;
+    font-weight: 700;
+    letter-spacing: -.022em;
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 18.5px;
+    line-height: 1.7;
+    color: var(--ink-2);
+    font-weight: 300;
+    margin: 0;
+  }
+
+  .meta-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    margin: 34px 0 0;
+    padding: 18px 0 0;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-3);
+  }
+
+  .meta-strip b { color: var(--ink-2); font-weight: 500; }
+
+  section { margin-top: 76px; scroll-margin-top: 24px; }
+
+  h2 {
+    font-size: 25px;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -.015em;
+    margin: 0 0 8px;
+    text-wrap: balance;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    align-items: baseline;
+  }
+
+  .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .04em;
+  }
+
+  .lede {
+    color: var(--ink-2);
+    font-size: 16.5px;
+    margin: 0 0 26px;
+    padding-left: 34px;
+  }
+
+  h3 {
+    font-size: 16.5px;
+    font-weight: 600;
+    letter-spacing: -.005em;
+    margin: 38px 0 10px;
+  }
+
+  p { margin: 0 0 18px; }
+  .doc > section > p,
+  .doc > section > ul,
+  .doc > section > ol { max-width: 68ch; }
+
+  a { color: var(--accent); text-underline-offset: 3px; }
+
+  code {
+    font-family: var(--mono);
+    font-size: .875em;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: 3px;
+    padding: .08em .34em;
+    word-break: break-all;
+  }
+
+  ul, ol { padding-left: 22px; margin: 0 0 18px; }
+  li { margin-bottom: 9px; }
+  li::marker { color: var(--ink-3); }
+
+  strong { font-weight: 600; }
+
+  /* ---------- 코드 블록 ---------- */
+  .code {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin: 0 0 22px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .code-head {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--surface-2);
+  }
+
+  .code pre {
+    margin: 0;
+    padding: 16px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.72;
+    color: var(--ink);
+    tab-size: 2;
+  }
+
+  .c-dim  { color: var(--ink-3); }
+  .c-acc  { color: var(--accent); font-weight: 500; }
+  .c-tar  { color: var(--tarnish); font-weight: 500; }
+  .c-bad  { color: var(--danger); font-weight: 500; }
+  .c-ok   { color: var(--ok); font-weight: 500; }
+
+  /* ---------- 좌표 해부도 ---------- */
+  .anatomy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 0 0 10px;
+    font-family: var(--mono);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .anatomy-part {
+    flex: 1 1 auto;
+    min-width: 130px;
+    padding: 14px 16px;
+    border-right: 1px solid var(--line-soft);
+  }
+
+  .anatomy-part:last-child { border-right: 0; }
+
+  .anatomy-key {
+    display: block;
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+
+  .anatomy-val { font-size: 13.5px; font-weight: 500; word-break: break-all; }
+  .anatomy-note { display: block; font-family: var(--sans); font-size: 11.5px; color: var(--ink-3); margin-top: 5px; line-height: 1.5; }
+
+  .anatomy.is-id .anatomy-part.k-id { background: var(--accent-bg); }
+  .anatomy.is-id .anatomy-part.k-id .anatomy-val { color: var(--accent); }
+
+  .cap {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin: 0 0 24px;
+    padding-left: 2px;
+  }
+
+  /* ---------- 표 ---------- */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    margin: 0 0 12px;
+    box-shadow: var(--shadow);
+  }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+
+  th, td {
+    text-align: left;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  th {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+  }
+
+  tbody tr:last-child td { border-bottom: 0; }
+
+  td.scope-name { font-family: var(--mono); font-weight: 500; color: var(--ink); }
+  td.wrap { white-space: normal; min-width: 220px; }
+  .yes { color: var(--ok); font-weight: 600; }
+  .no  { color: var(--ink-3); }
+  .row-hi td { background: var(--accent-bg); }
+
+  /* ---------- 콜아웃 ---------- */
+  .note {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    margin: 0 0 24px;
+  }
+
+  .note.is-warn { border-left-color: var(--danger); }
+  .note.is-key  { border-left-color: var(--tarnish); }
+
+  .note-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--accent);
+    margin: 0 0 7px;
+  }
+
+  .note.is-warn .note-title { color: var(--danger); }
+  .note.is-key  .note-title { color: var(--tarnish); }
+  .note p:last-child { margin-bottom: 0; }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 3px;
+    background: var(--ok-bg);
+    color: var(--ok);
+    vertical-align: 2px;
+    margin-left: 8px;
+    white-space: nowrap;
+  }
+
+  /* ---------- 대조 카드 ---------- */
+  .versus {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin: 0 0 24px;
+  }
+
+  @media (min-width: 620px) {
+    .versus { grid-template-columns: 1fr 1fr; }
+  }
+
+  .vcard {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px;
+    background: var(--surface);
+  }
+
+  .vcard.is-new { border-top: 3px solid var(--accent); }
+  .vcard.is-old { border-top: 3px solid var(--tarnish); }
+
+  .vcard h4 {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    word-break: break-all;
+  }
+
+  .vcard.is-new h4 { color: var(--accent); }
+  .vcard.is-old h4 { color: var(--tarnish); }
+
+  .vcard dl { margin: 12px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13px; }
+  .vcard dt { color: var(--ink-3); font-size: 11.5px; letter-spacing: .03em; padding-top: 2px; }
+  .vcard dd { margin: 0; font-family: var(--mono); font-size: 12.5px; word-break: break-all; }
+
+  /* ---------- 순서 시각화 ---------- */
+  .order {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    margin: 0 0 12px;
+  }
+
+  .order-row {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: var(--surface);
+  }
+
+  .order-row.is-win { border-color: var(--tarnish); background: var(--tarnish-bg); }
+  .order-row.is-lose { opacity: .62; }
+  .order-idx { color: var(--ink-3); font-variant-numeric: tabular-nums; text-align: right; }
+  .order-row.is-win .order-idx { color: var(--tarnish); font-weight: 600; }
+  .order-name { word-break: break-all; }
+  .order-tag {
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--tarnish);
+    font-weight: 600;
+  }
+
+  hr.rule { border: 0; border-top: 1px solid var(--line); margin: 68px 0 0; }
+
+  .closing {
+    margin-top: 76px;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface-2);
+  }
+
+  .closing h2 { margin-bottom: 16px; }
+  .closing ol { margin-bottom: 0; padding-left: 20px; }
+  .closing li { margin-bottom: 12px; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .sitenav { max-width: 1180px; margin: 0 auto; padding: 28px 24px 0; font-family: var(--mono); font-size: 12px; }
+  .sitenav a { color: var(--ink-3); text-decoration: none; }
+  .sitenav a:hover, .sitenav a:focus-visible { color: var(--accent); }
+  @media (min-width: 1000px) { .sitenav { padding: 28px 32px 0; } }
+</style>
+
+</head>
+<body>
+<nav class="sitenav"><a href="/">← stay-stranger</a></nav>
+<div class="shell">
+
+  <nav class="toc" aria-label="목차">
+    <p class="toc-label">목차</p>
+    <ol>
+      <li><a href="#s1">좌표 — Maven이 “같은 것”을 판단하는 기준</a></li>
+      <li><a href="#s2">스코프 — 어느 클래스패스에 오를 것인가</a></li>
+      <li><a href="#s3">전이 의존성 — 부르지 않은 손님</a></li>
+      <li><a href="#s4">중재 — 가장 가까운 선언이 이긴다</a></li>
+      <li><a href="#s5">그래서 왜 test가 답인가</a></li>
+      <li><a href="#s6">클래스로딩 — 이름이 같으면 벌어지는 일</a></li>
+      <li><a href="#s7">사건 재구성</a></li>
+      <li><a href="#s8">실무 원칙</a></li>
+    </ol>
+  </nav>
+
+  <main class="doc">
+
+    <p class="eyebrow">Maven 의존성 해석 · 사례 학습</p>
+    <h1>두 개의 OracleDriver</h1>
+    <p class="standfirst">
+      <code>pom.xml</code> 열세 줄이 어떻게 “운영은 되는데 로컬만 죽는” 상황을 만들었는가.
+      좌표·스코프·전이·중재·클래스로딩이 한 사건 안에서 어떻게 맞물리는지 따라가면,
+      다섯 개념이 각각의 정의보다 훨씬 오래 기억에 남습니다.
+    </p>
+
+    <div class="meta-strip">
+      <span><b>대상</b> web-app (Spring Boot 1.2.5 / Java 8)</span>
+      <span><b>증상</b> ORA-28040</span>
+      <span><b>범인</b> ojdbc14 10.2.0.4.0</span>
+    </div>
+
+    <!-- 1 -->
+    <section id="s1">
+      <h2><span class="num">01</span><span>좌표 — Maven이 “같은 것”을 판단하는 기준</span></h2>
+      <p class="lede">두 드라이버가 공존할 수 있었던 근본 이유는 여기에 있습니다.</p>
+
+      <p>
+        Maven은 모든 아티팩트를 <strong>좌표(coordinates)</strong>로 식별합니다.
+        전체 형태는 <code>groupId:artifactId:packaging:classifier:version</code>이고, 보통은 앞의 셋만 씁니다.
+      </p>
+
+      <div class="anatomy is-id">
+        <div class="anatomy-part k-id">
+          <span class="anatomy-key">groupId</span>
+          <span class="anatomy-val">com.oracle.database.jdbc</span>
+          <span class="anatomy-note">배포 주체의 네임스페이스</span>
+        </div>
+        <div class="anatomy-part k-id">
+          <span class="anatomy-key">artifactId</span>
+          <span class="anatomy-val">ojdbc8</span>
+          <span class="anatomy-note">산출물 이름</span>
+        </div>
+        <div class="anatomy-part">
+          <span class="anatomy-key">version</span>
+          <span class="anatomy-val">19.21.0.0</span>
+          <span class="anatomy-note">버전</span>
+        </div>
+      </div>
+      <p class="cap">파란 두 칸이 <strong>동일성 키</strong>입니다. 버전은 식별자가 아니라 “골라야 할 값”입니다.</p>
+
+      <p>
+        핵심 규칙은 이것입니다. <strong>Maven이 “같은 라이브러리”로 보는 단위는 <code>groupId:artifactId</code>(줄여서 GA)</strong>이고,
+        version은 그 안에서 하나를 고르는 대상입니다. 그래서 같은 GA가 여러 버전으로 들어오면 Maven이 개입해 하나만 남기지만,
+        <strong>GA가 다르면 개입 자체를 하지 않습니다.</strong> 서로 아무 관계 없는 별개 라이브러리로 취급하니까요.
+      </p>
+
+      <div class="versus">
+        <div class="vcard is-new">
+          <h4>com.oracle.database.jdbc:ojdbc8</h4>
+          <dl>
+            <dt>버전</dt><dd>19.21.0.0</dd>
+            <dt>배포</dt><dd>2023</dd>
+            <dt>대상 JDK</dt><dd>Java 8</dd>
+            <dt>DB 세대</dt><dd>19c 계열</dd>
+          </dl>
+        </div>
+        <div class="vcard is-old">
+          <h4>com.oracle:ojdbc14</h4>
+          <dl>
+            <dt>버전</dt><dd>10.2.0.4.0</dd>
+            <dt>배포</dt><dd>2008</dd>
+            <dt>대상 JDK</dt><dd>JDK 1.4</dd>
+            <dt>DB 세대</dt><dd>10g 계열</dd>
+          </dl>
+        </div>
+      </div>
+
+      <p>
+        groupId도 artifactId도 다릅니다. Maven 입장에서 이 둘은 <em>Jackson과 Gson만큼이나</em> 무관한 라이브러리입니다.
+        그래서 버전 충돌 해결이 일어나지 않고, <strong>둘 다 클래스패스에 올라갑니다.</strong>
+        여기서 이번 사건의 씨앗이 뿌려집니다.
+      </p>
+
+      <div class="note is-key">
+        <p class="note-title">알아두면 평생 쓰는 상식 — ojdbc 뒤 숫자는 DB 버전이 아니다</p>
+        <p>
+          <code>ojdbc14</code>는 <strong>JDK 1.4</strong>용, <code>ojdbc6</code>은 Java 6용, <code>ojdbc8</code>은 Java 8용,
+          <code>ojdbc11</code>은 Java 11용입니다. 지원하는 <strong>DB 버전은 version 필드</strong>가 말해 줍니다
+          (<code>19.21.0.0</code> = 19c 계열 드라이버). “ojdbc14니까 14c겠지”는 흔한 오해이고, 실제로는 존재하지도 않는 버전입니다.
+        </p>
+        <p>
+          groupId가 <code>com.oracle</code>에서 <code>com.oracle.database.jdbc</code>로 바뀐 것도 역사적 사건입니다.
+          예전엔 라이선스 때문에 Maven Central 배포가 막혀 사내 저장소에 수동 업로드하던 것을,
+          2019년부터 오라클이 공식 배포하면서 새 네임스페이스를 썼습니다.
+          <strong>구버전과 신버전의 GA가 다른 이유가 바로 이것</strong>이고, 덕분에 둘이 조용히 공존할 수 있게 됐습니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <h2><span class="num">02</span><span>스코프 — 어느 클래스패스에 오를 것인가</span></h2>
+      <p class="lede">의존성을 “쓴다/안 쓴다”가 아니라 “언제 쓴다”로 나누는 장치입니다.</p>
+
+      <p>
+        Maven은 클래스패스를 하나로 두지 않습니다. 컴파일할 때, 테스트할 때, 실제로 실행·패키징할 때가 각각 다릅니다.
+        <code>&lt;scope&gt;</code>는 그 의존성이 <strong>어느 클래스패스에 참여할지</strong>를 정합니다. 여섯 종류가 있습니다.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>스코프</th>
+              <th>컴파일</th>
+              <th>테스트</th>
+              <th>런타임·패키징</th>
+              <th>전이</th>
+              <th class="wrap">전형적 용도</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="scope-name">compile</td>
+              <td class="yes">O</td><td class="yes">O</td><td class="yes">O</td><td class="yes">O</td>
+              <td class="wrap">기본값. 명시하지 않으면 전부 이것</td>
+            </tr>
+            <tr>
+              <td class="scope-name">provided</td>
+              <td class="yes">O</td><td class="yes">O</td><td class="no">X</td><td class="no">X</td>
+              <td class="wrap">servlet-api처럼 컨테이너가 이미 갖고 있는 것</td>
+            </tr>
+            <tr>
+              <td class="scope-name">runtime</td>
+              <td class="no">X</td><td class="yes">O</td><td class="yes">O</td><td class="yes">O</td>
+              <td class="wrap">코드가 직접 참조하지 않는 구현체 — <strong>JDBC 드라이버의 교과서적 정답</strong></td>
+            </tr>
+            <tr class="row-hi">
+              <td class="scope-name">test</td>
+              <td class="no">X</td><td class="yes">O</td><td class="no">X</td><td class="no">X</td>
+              <td class="wrap">JUnit, Mockito 등 테스트에서만 쓰는 것</td>
+            </tr>
+            <tr>
+              <td class="scope-name">system</td>
+              <td class="yes">O</td><td class="yes">O</td><td class="no">X</td><td class="no">X</td>
+              <td class="wrap">로컬 경로 직접 지정. 사실상 폐기, 쓰지 말 것</td>
+            </tr>
+            <tr>
+              <td class="scope-name">import</td>
+              <td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td>
+              <td class="wrap"><code>dependencyManagement</code> 전용. BOM 가져오기</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cap">파랗게 강조된 행이 이번에 우리가 쓴 스코프입니다.</p>
+
+      <p>
+        표에서 <code>test</code> 행을 보세요. <strong>컴파일 클래스패스에도, 런타임·패키징에도 오르지 않습니다.</strong>
+        오직 테스트를 돌릴 때만 존재합니다. 그리고 <strong>전이도 되지 않습니다</strong> —
+        내가 의존하는 라이브러리의 test 의존성은 나에게 따라오지 않습니다. 당연합니다. 남의 테스트 도구가 내 실행 환경에 있을 이유가 없죠.
+      </p>
+
+      <p>
+        여기서 자연스러운 질문이 나옵니다. <em>“실행에서 빼려는 거면 <code>provided</code>도 되지 않나?”</em>
+        일반론으로는 그렇습니다. 하지만 Spring Boot에서는 아닙니다.
+      </p>
+
+      <div class="note">
+        <p class="note-title">왜 provided가 아니라 test인가 <span class="badge">실측 확인</span></p>
+        <p>
+          Spring Boot의 실행 가능 jar(fat jar)에는 컨테이너가 없습니다. 그래서 Boot는 <code>provided</code>도 jar 안에 넣어 줍니다.
+          <code>spring-boot-maven-plugin</code> 1.2.5의 <code>ArtifactsLibraries</code> 클래스를 직접 열어 보면,
+          jar에 담을 스코프 목록에 정확히 세 개만 등록돼 있습니다.
+        </p>
+        <div class="code" style="margin-top:14px;">
+          <div class="code-head">javap -c ArtifactsLibraries.class — SCOPES 초기화</div>
+<pre>  9: ldc  #41  <span class="c-dim">// String</span> <span class="c-ok">compile</span>
+ 21: ldc  #44  <span class="c-dim">// String</span> <span class="c-ok">runtime</span>
+ 33: ldc  #46  <span class="c-dim">// String</span> <span class="c-ok">provided</span>
+ 48: putstatic  #10  <span class="c-dim">// Field SCOPES</span></pre>
+        </div>
+        <p>
+          <code>test</code>는 목록에 없습니다. 즉 <strong><code>provided</code>로 뒀다면 fat jar 안에 그대로 남아</strong> 아무것도 해결되지 않았을 것이고,
+          <code>test</code>여야만 실행과 배포 양쪽에서 사라집니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <h2><span class="num">03</span><span>전이 의존성 — 부르지 않은 손님</span></h2>
+      <p class="lede">우리는 ojdbc14를 선언한 적이 없습니다. 그런데 거기 있었습니다.</p>
+
+      <p>
+        A가 B를 의존하고 B가 C를 의존하면, A는 C도 함께 받습니다. 이것이 <strong>전이 의존성</strong>이고,
+        Maven이 Ant보다 편한 가장 큰 이유이자 이런 사고의 가장 큰 원인이기도 합니다.
+        <code>web-app</code>이 ojdbc14를 얻게 된 실제 경로는 이렇습니다.
+      </p>
+
+      <div class="code">
+        <div class="code-head">ojdbc14가 도착하는 경로</div>
+<pre>web-app
+└─ <span class="c-dim">(부모 pom)</span> platform-boot-dependencies
+   └─ platform-kernel / framework-boot        <span class="c-dim">scope: compile</span>
+      └─ platform-core
+         └─ framework-data-jpa
+            └─ framework-data
+               └─ <span class="c-tar">com.oracle:ojdbc14:10.2.0.4.0</span>  <span class="c-bad">← 여기</span></pre>
+      </div>
+
+      <p>
+        <code>framework-data</code>의 pom이 ojdbc14를 직접 선언하고 있고, 그 위로는 아무도 <code>&lt;exclusion&gt;</code>을 걸지 않았습니다.
+        (부모 pom을 검사한 결과 exclusion 선언은 0건이었습니다.)
+        더 성가신 건 <code>framework-data-jpa</code>를 참조하는 모듈이 하나가 아니라는 점입니다 —
+        <code>platform-core</code>, <code>framework-file</code>, <code>framework-user</code>, <code>framework-domain</code>, <code>framework-web-endpoint</code>.
+        <strong>ojdbc14로 가는 길이 다섯 갈래</strong>인 셈입니다. 이 사실은 4절에서 결정적인 의미를 갖습니다.
+      </p>
+
+      <h3>스코프는 전이되면서 약해진다</h3>
+      <p>
+        전이된 의존성의 스코프는 원래 스코프 그대로가 아니라, <strong>경로상 두 스코프의 조합</strong>으로 다시 계산됩니다.
+        규칙의 요점만 기억하면 됩니다.
+      </p>
+
+      <ul>
+        <li><strong>compile 경로로 온 compile</strong> → compile. 이번 케이스가 여기 해당합니다.</li>
+        <li><strong>provided를 거쳐 온 것</strong> → provided (또는 생략).</li>
+        <li><strong>test를 거쳐 온 것</strong> → <strong>아예 생략</strong>. 전이되지 않습니다.</li>
+        <li><strong>runtime을 거쳐 온 compile</strong> → runtime으로 강등.</li>
+      </ul>
+
+      <p>
+        경로 전체가 compile이었기 때문에, ojdbc14는 <strong>compile 스코프로 우리 프로젝트에 도착</strong>했습니다.
+        컴파일에도, 실행에도, fat jar에도 전부 포함되는 가장 강한 형태로 말입니다.
+      </p>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <h2><span class="num">04</span><span>중재 — 가장 가까운 선언이 이긴다</span></h2>
+      <p class="lede">Maven이 같은 GA의 후보 여럿 중 하나를 고르는 방법.</p>
+
+      <p>
+        같은 GA가 여러 경로로 들어오면 Maven은 <strong>중재(mediation)</strong>를 수행합니다. 규칙은 단순합니다.
+      </p>
+
+      <div class="note is-key">
+        <p class="note-title">Nearest definition wins — 가장 가까운 선언이 이긴다</p>
+        <p>
+          루트 프로젝트에서 <strong>트리 깊이가 가장 얕은</strong> 선언이 채택됩니다.
+          깊이가 같으면 pom에 <strong>먼저 쓰인 것</strong>이 이깁니다.
+          그리고 <strong>내 pom에 직접 쓴 선언은 깊이 1</strong>이라 언제나 최우선입니다.
+        </p>
+      </div>
+
+      <p>
+        중요한 것은 중재가 <strong>version만이 아니라 그 선언 전체를 채택</strong>한다는 점입니다. 스코프도 함께 따라옵니다.
+        직접 선언은 전이로 들어온 모든 후보를 무력화하고, 자신의 스코프를 그 GA의 최종 스코프로 확정합니다.
+      </p>
+
+      <h3>왜 exclusion이 아니라 직접 선언인가</h3>
+      <p>
+        <code>&lt;exclusion&gt;</code>은 <strong>특정 경로 하나</strong>를 잘라내는 도구입니다.
+        경로가 다섯 갈래인 이번 상황에서는 다섯 군데에 각각 걸어야 하고, 나중에 여섯 번째 경로가 생기면 조용히 되살아납니다.
+        반면 직접 선언은 <strong>깊이 1이라는 위치의 힘</strong>으로 경로 수와 무관하게 한 번에 정리합니다.
+      </p>
+
+      <div class="versus">
+        <div class="vcard is-old">
+          <h4>&lt;exclusion&gt; 방식</h4>
+          <dl>
+            <dt>손댈 곳</dt><dd>5군데</dd>
+            <dt>새 경로</dt><dd>다시 유입됨</dd>
+            <dt>가독성</dt><dd>낮음</dd>
+          </dl>
+        </div>
+        <div class="vcard is-new">
+          <h4>직접 선언 + test</h4>
+          <dl>
+            <dt>손댈 곳</dt><dd>1군데</dd>
+            <dt>새 경로</dt><dd>자동 차단</dd>
+            <dt>가독성</dt><dd>의도가 드러남</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="note">
+        <p class="note-title">헷갈리기 쉬운 이웃 — dependencyManagement</p>
+        <p>
+          <code>&lt;dependencyManagement&gt;</code>는 “쓰게 되면 이 버전·스코프로 써라”라는 <strong>사전 규격</strong>일 뿐,
+          그 자체로 의존성을 추가하지 않습니다. 반면 <code>&lt;dependencies&gt;</code>에 쓰는 순간 실제로 추가됩니다.
+          우리가 한 것은 후자입니다. 참고로 dependencyManagement는 중재보다 <strong>우선</strong>해서 적용되므로,
+          부모 pom을 고칠 수 있는 상황이라면 거기서 스코프를 지정하는 방법도 있습니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <h2><span class="num">05</span><span>그래서 왜 test가 답인가</span></h2>
+      <p class="lede">여기가 가장 오해하기 쉬운 지점입니다. 천천히 보세요.</p>
+
+      <p>
+        1절에서 “GA가 다르면 Maven이 개입하지 않는다”고 했습니다. 그렇다면 이런 의문이 듭니다 —
+        <em>ojdbc8과 ojdbc14는 GA가 다른데, 어떻게 한쪽을 선언해서 다른 쪽을 없앤다는 거지?</em>
+      </p>
+
+      <p>
+        답은 <strong>둘 사이에 중재가 일어나는 게 아니라는 것</strong>입니다. 벌어지는 일은 이렇습니다.
+      </p>
+
+      <ol>
+        <li>
+          <code>com.oracle:ojdbc14</code>라는 <strong>하나의 GA</strong>에 대해, 후보가 여섯 개 생깁니다 —
+          전이 경로 다섯 개(깊이 4~6)와 우리가 직접 쓴 선언 하나(깊이 1).
+        </li>
+        <li>
+          같은 GA이므로 <strong>중재가 발동</strong>하고, 가장 얕은 <strong>직접 선언이 이깁니다.</strong>
+        </li>
+        <li>
+          채택된 선언의 스코프가 <code>test</code>이므로, ojdbc14의 최종 스코프는 <strong>test로 확정</strong>됩니다.
+        </li>
+        <li>
+          test는 런타임·패키징 클래스패스에 오르지 않으므로, <strong>실행 시점에 ojdbc14는 존재하지 않습니다.</strong>
+        </li>
+        <li>
+          그 결과 클래스패스에 남는 Oracle 드라이버는 <code>ojdbc8</code> 하나뿐입니다.
+        </li>
+      </ol>
+
+      <div class="note is-key">
+        <p class="note-title">한 줄 요약</p>
+        <p>
+          ojdbc8이 ojdbc14를 <em>이긴</em> 게 아닙니다.
+          <strong>ojdbc14가 자기들끼리 중재된 끝에 test로 확정돼 스스로 무대에서 내려간 것</strong>이고,
+          그래서 ojdbc8만 남은 것입니다.
+        </p>
+      </div>
+
+      <p>
+        이 구분이 왜 중요하냐면 — <strong>ojdbc8 선언을 추가하는 것만으로는 아무것도 해결되지 않기 때문</strong>입니다.
+        추가는 교체가 아닙니다. 실제로 이 프로젝트는 오래전부터 ojdbc8을 선언하고 있었지만, ojdbc14는 그대로 남아 있었습니다.
+      </p>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <h2><span class="num">06</span><span>클래스로딩 — 이름이 같으면 벌어지는 일</span></h2>
+      <p class="lede">둘이 공존하면 왜 문제가 되는지, JVM 층위에서.</p>
+
+      <p>
+        두 jar가 동시에 있어도, 담긴 클래스 이름이 다르면 아무 일도 없습니다. 문제는 <strong>이름이 겹칠 때</strong>입니다.
+        확인해 보면 두 jar 모두 똑같은 두 개의 완전한 클래스 이름(FQCN)을 갖고 있습니다.
+      </p>
+
+      <div class="code">
+        <div class="code-head">unzip -l — 양쪽 jar의 드라이버 클래스</div>
+<pre><span class="c-tar">ojdbc14-10.2.0.4.0.jar</span>
+  oracle/jdbc/driver/OracleDriver.class   <span class="c-dim">14,943 bytes  (2008)</span>
+  oracle/jdbc/OracleDriver.class          <span class="c-dim">   489 bytes  (2008)</span>
+
+<span class="c-acc">ojdbc8-19.21.0.0.jar</span>
+  oracle/jdbc/driver/OracleDriver.class   <span class="c-dim">21,444 bytes  (2023)</span>
+  oracle/jdbc/OracleDriver.class          <span class="c-dim"> 2,604 bytes  (2023)</span></pre>
+      </div>
+
+      <p>
+        JVM의 클래스로더는 클래스패스를 <strong>앞에서부터 훑다가 처음 만난 것을 채택</strong>하고 즉시 멈춥니다.
+        버전을 비교하지도, 더 새것을 찾지도 않습니다. 그래서 <strong>순서가 전부</strong>입니다.
+        로컬 실행 로그에서 뽑은 실제 순서는 이랬습니다.
+      </p>
+
+      <div class="order">
+        <div class="order-row is-win">
+          <span class="order-idx">80</span>
+          <span class="order-name">ojdbc14-10.2.0.4.0.jar <span class="order-tag">채택됨</span></span>
+        </div>
+        <div class="order-row is-lose">
+          <span class="order-idx">84</span>
+          <span class="order-name">ojdbc8-19.21.0.0.jar</span>
+        </div>
+      </div>
+      <p class="cap">단 네 칸 차이로 2008년 드라이버가 2023년 드라이버를 가렸습니다.</p>
+
+      <div class="note is-warn">
+        <p class="note-title">이 사건의 백미 — ojdbc8이 ojdbc14를 등록해 준다 <span class="badge">실측 확인</span></p>
+        <p>
+          JDBC 4.0부터 드라이버는 <code>META-INF/services/java.sql.Driver</code> 파일로 자동 등록됩니다.
+          그런데 확인해 보니 <strong>2008년산 ojdbc14에는 이 파일이 아예 없고</strong>(JDBC 4.0 이전 산물),
+          ojdbc8에만 있었습니다. 내용은 이렇습니다.
+        </p>
+        <div class="code" style="margin-top:14px;">
+          <div class="code-head">ojdbc8 → META-INF/services/java.sql.Driver</div>
+<pre>oracle.jdbc.OracleDriver</pre>
+        </div>
+        <p>
+          여기 적힌 건 <strong>클래스의 “이름”일 뿐</strong>입니다. JVM이 이 이름을 로드하러 가면 클래스패스 순서를 따르고,
+          앞에 있는 ojdbc14의 클래스를 집어옵니다. 결과적으로
+          <strong>ojdbc8의 등록 파일이 ojdbc14의 드라이버를 등록해 주는</strong> 상황이 됩니다.
+          ojdbc14 단독으로는 자동 등록이 안 돼 <code>No suitable driver found</code>가 나는데,
+          ojdbc8을 “고치려고” 추가한 순간 오히려 옛 드라이버가 살아난 셈입니다.
+        </p>
+      </div>
+
+      <p>
+        그렇게 살아난 10.2 드라이버는 구형 인증 프로토콜(O3LOGON)을 씁니다.
+        Oracle 19c는 <code>SQLNET.ALLOWED_LOGON_VERSION_SERVER</code> 기본값이 12라 이를 거부하고,
+        <strong><code>ORA-28040: 일치하는 인증 프로토콜 없음</code></strong>을 돌려줍니다.
+        12c는 받아 주던 것이라 그동안 아무도 몰랐습니다.
+      </p>
+
+      <div class="note">
+        <p class="note-title">스택트레이스 읽는 법</p>
+        <p>
+          실제 로그에서는 이 한 줄 뒤에 <code>BeanCreationException</code>이 스무 겹 쌓였습니다.
+          연결이 안 되니 Hibernate가 방언(dialect)을 판정하지 못하고
+          (<code>Access to DialectResolutionInfo cannot be null</code>), <code>entityManagerFactory</code>가 실패하고,
+          그것을 주입받는 빈들이 연쇄로 무너진 것입니다.
+          <strong>스무 겹은 전부 2차 피해이고, 원인은 맨 처음 한 줄</strong>이었습니다.
+          긴 스택을 만나면 아래에서 위가 아니라 <em>시간순으로 가장 먼저 찍힌 줄</em>을 찾으세요.
+        </p>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <h2><span class="num">07</span><span>사건 재구성</span></h2>
+      <p class="lede">같은 pom인데 왜 서버는 살아 있고 로컬만 죽었는가.</p>
+
+      <p>
+        클래스패스 순서는 Maven이 의존성을 해석한 순서를 따르는데, 이 순서는 <strong>어떤 목표(goal)를 실행하느냐에 따라 달라집니다.</strong>
+        <code>spring-boot:run</code>은 test 스코프까지 포함해 해석하고, <code>repackage</code>는 compile·runtime만 해석합니다.
+        해석 요청이 다르면 결과 집합의 순회 순서도 달라질 수 있습니다.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>실행 방식</th><th>먼저 읽힌 드라이버</th><th class="wrap">결과</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="scope-name">spring-boot:run <span class="c-dim">(로컬)</span></td>
+              <td style="color:var(--tarnish);font-weight:600;">ojdbc14</td>
+              <td class="wrap"><span style="color:var(--danger);font-weight:600;">ORA-28040 — 기동 실패</span></td>
+            </tr>
+            <tr>
+              <td class="scope-name">fat jar <span class="c-dim">(서버 배포)</span></td>
+              <td style="color:var(--accent);font-weight:600;">ojdbc8</td>
+              <td class="wrap"><span style="color:var(--ok);font-weight:600;">정상 — 우연히 살아남음</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        서버가 ojdbc8을 쓰고 있다는 것은 추측이 아니라 확인된 사실입니다.
+        개발 19c에 붙어 있는 세션을 조회하니, <code>app-dev-01</code>에서 온 36개 세션이 전부 19.21 드라이버였습니다.
+      </p>
+
+      <div class="code">
+        <div class="code-head">개발 19c — v$session_connect_info</div>
+<pre>USERNAME     MACHINE   CLIENT_DRIVER              CNT
+CENTER_SCHEMA   app-dev-01    <span class="c-ok">jdbcthin : 19.21.0.0.0</span>      9
+APP_SCHEMA    app-dev-01    <span class="c-ok">jdbcthin : 19.21.0.0.0</span>     15
+BRANCH_SCHEMA   app-dev-01    <span class="c-ok">jdbcthin : 19.21.0.0.0</span>     12</pre>
+      </div>
+
+      <p>
+        즉 “ojdbc8 선언 덕분에 서버가 돈다”는 말은 <strong>결과적으로는 맞지만, 보장된 것은 아니었습니다.</strong>
+        ojdbc14가 클래스패스에 남아 있는 한 그것은 순서 운이고,
+        Maven 버전이 바뀌거나 의존성 하나만 추가돼도 서버 쪽에서 순서가 뒤집힐 수 있었습니다.
+        <strong>운영이 무사했던 것은 설계가 아니라 운이었다</strong>는 점이 이 사건의 진짜 교훈입니다.
+      </p>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <h2><span class="num">08</span><span>실무 원칙</span></h2>
+      <p class="lede">같은 사고를 다시 겪지 않기 위한 장치들.</p>
+
+      <h3>정기 점검 — 무엇이 들어와 있는지 본다</h3>
+      <div class="code">
+        <div class="code-head">bash</div>
+<pre><span class="c-dim"># 특정 아티팩트가 어느 경로로 들어오는지</span>
+mvn dependency:tree -Dincludes=com.oracle:ojdbc14
+
+<span class="c-dim"># 실제 런타임 클래스패스에 무엇이 오르는지 (가장 확실)</span>
+mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout -q \
+  | tr ':' '\n' | grep -i ojdbc</pre>
+      </div>
+
+      <h3>재유입 차단 — enforcer로 못을 박는다</h3>
+      <p>
+        사람이 기억하는 대신 빌드가 막게 하는 편이 낫습니다.
+        누군가 나중에 ojdbc14를 다시 끌고 오는 의존성을 추가하면 <strong>빌드가 실패</strong>합니다.
+      </p>
+      <div class="code">
+        <div class="code-head">pom.xml — maven-enforcer-plugin</div>
+<pre>&lt;plugin&gt;
+  &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+  &lt;artifactId&gt;maven-enforcer-plugin&lt;/artifactId&gt;
+  &lt;executions&gt;&lt;execution&gt;
+    &lt;id&gt;ban-legacy-jdbc&lt;/id&gt;
+    &lt;goals&gt;&lt;goal&gt;enforce&lt;/goal&gt;&lt;/goals&gt;
+    &lt;configuration&gt;&lt;rules&gt;&lt;bannedDependencies&gt;
+      &lt;excludes&gt;
+        &lt;exclude&gt;com.oracle:ojdbc14&lt;/exclude&gt;
+      &lt;/excludes&gt;
+      &lt;message&gt;<span class="c-dim">ojdbc14는 19c에 접속할 수 없습니다(ORA-28040). ojdbc8을 쓰세요.</span>&lt;/message&gt;
+    &lt;/bannedDependencies&gt;&lt;/rules&gt;&lt;/configuration&gt;
+  &lt;/execution&gt;&lt;/executions&gt;
+&lt;/plugin&gt;</pre>
+      </div>
+
+      <h3>배포 산출물 확인 — 실제로 빠졌는지 눈으로 본다</h3>
+      <div class="code">
+        <div class="code-head">bash</div>
+<pre>mvn package -DskipTests
+unzip -l target/web-app.jar | grep -i ojdbc
+<span class="c-dim"># ojdbc8 한 줄만 나오면 정상</span></pre>
+      </div>
+
+      <h3>운영에서 실제 드라이버 확인</h3>
+      <div class="code">
+        <div class="code-head">SQL — 지금 붙어 있는 세션이 무슨 드라이버인지</div>
+<pre>select s.username, s.machine,
+       ci.client_driver, ci.client_version, count(*)
+  from v$session s
+  join v$session_connect_info ci
+    on s.sid = ci.sid and s.serial# = ci.serial#
+ where s.type = 'USER'
+ group by s.username, s.machine, ci.client_driver, ci.client_version;</pre>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <div class="closing">
+      <h2><span class="num">■</span><span>기억할 다섯 가지</span></h2>
+      <ol>
+        <li>
+          <strong>Maven의 동일성 단위는 <code>groupId:artifactId</code>다.</strong>
+          GA가 다르면 같은 기능의 라이브러리라도 충돌 해결 없이 나란히 공존한다.
+        </li>
+        <li>
+          <strong>추가는 교체가 아니다.</strong> 새 드라이버를 선언해도 옛 드라이버는 사라지지 않는다.
+          교체하려면 옛것을 명시적으로 치워야 한다.
+        </li>
+        <li>
+          <strong>같은 FQCN이 두 개면 클래스패스 순서가 승자를 정한다.</strong>
+          그 순서는 Maven이 보장해 주지 않으므로, 순서에 기대는 구성은 언젠가 뒤집힌다.
+        </li>
+        <li>
+          <strong>직접 선언은 깊이 1이라 전이 경로가 몇 갈래든 한 번에 이긴다.</strong>
+          그 선언의 스코프가 곧 그 GA의 최종 스코프가 된다.
+        </li>
+        <li>
+          <strong>스코프는 “어느 클래스패스에 오를지”를 정한다.</strong>
+          Spring Boot fat jar는 provided까지 담으므로, 실행에서 완전히 빼려면 <code>test</code>여야 한다.
+        </li>
+      </ol>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

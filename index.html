@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stay-stranger</title>
+<meta name="description" content="개발하다 만난 오류를 증상이 아니라 원인까지 따라간 기록.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <a class="wordmark" href="/">stay-stranger</a>
+    <h1>증상이 아니라 원인을 적는다</h1>
+    <p>
+      개발하면서 만난 오류를 기록합니다. 무엇을 고쳤는지가 아니라,
+      왜 그렇게 됐고 어떻게 그것을 증명했는지를 남깁니다.
+    </p>
+    <hr class="masthead-rule">
+  </header>
+
+  <section class="category">
+    <div class="category-head">
+      <h2>오류처리</h2>
+      <span class="category-count">1편</span>
+    </div>
+    <p class="category-note">
+      재현 → 원인 규명 → 증명 → 수정 순서로 따라간 실제 사례.
+    </p>
+
+    <div class="posts">
+      <a class="post" href="/error-handling/two-oracle-drivers.html">
+        <div class="post-meta">
+          <span class="post-date">2026.08.24</span>
+          <span class="tag">Maven</span>
+          <span class="tag">JDBC</span>
+          <span class="tag">Oracle</span>
+        </div>
+        <h3>두 개의 OracleDriver</h3>
+        <p>
+          운영 서버는 멀쩡한데 로컬만 죽었다. 원인은 20년 된 드라이버가
+          클래스패스에서 새 드라이버를 가린 것이었고, 서버가 무사했던 건
+          설계가 아니라 순서 운이었다. 좌표·스코프·전이·중재·클래스로딩이
+          한 사건 안에서 맞물리는 과정을 따라간다.
+        </p>
+        <span class="post-error">ORA-28040</span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>© 2026 stay-stranger</span>
+    <a href="https://github.com/stay-stranger">github.com/stay-stranger</a>
+  </footer>
+
+</div>
+
+</body>
+</html>
