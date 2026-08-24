@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="한 문장으로 이 글이 무엇을 다루는지. 홈 카드와 검색 결과에 쓰인다.">
+<title>글 제목</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/post.css">
+</head>
+<body>
+<nav class="sitenav"><a href="/">← stay-stranger</a></nav>
+
+<div class="shell">
+
+  <!-- 목차: 절과 1:1로 맞출 것. 절이 3개 미만이면 이 <nav> 통째로 삭제 -->
+  <nav class="toc" aria-label="목차">
+    <p class="toc-label">목차</p>
+    <ol>
+      <li><a href="#s1">첫 번째 절 제목</a></li>
+      <li><a href="#s2">두 번째 절 제목</a></li>
+    </ol>
+  </nav>
+
+  <main class="doc">
+
+    <p class="eyebrow">분야 · 글 성격</p>
+    <h1>글 제목</h1>
+    <p class="standfirst">
+      두세 문장. 무엇이 일어났고 이 글을 읽으면 무엇을 알게 되는지.
+      결론을 숨기지 않는다.
+    </p>
+
+    <!-- 사건형 글에만. 개념 설명 글이면 삭제 -->
+    <div class="meta-strip">
+      <span><b>대상</b> 익명화된 시스템 이름 (스택 / 버전)</span>
+      <span><b>증상</b> 오류 코드</span>
+      <span><b>범인</b> 실제 원인</span>
+    </div>
+
+    <section id="s1">
+      <h2><span class="num">01</span><span>첫 번째 절 제목</span></h2>
+      <p class="lede">이 절에서 무엇을 알게 되는지 한 문장.</p>
+
+      <p>본문. 결론을 먼저 쓰고 근거를 뒤에 붙인다.</p>
+
+      <h3>소제목</h3>
+
+      <div class="code">
+        <div class="code-head">명령 또는 파일 경로</div>
+<pre>실제로 실행한 명령과 <span class="c-ok">실제</span> 출력
+<span class="c-dim"># 주석</span>
+<span class="c-bad">오류 줄</span>
+<span class="c-tar">문제의 원인</span>
+<span class="c-acc">강조</span></pre>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>값</th><th class="wrap">설명</th></tr></thead>
+          <tbody>
+            <tr><td class="scope-name">key</td><td class="yes">O</td><td class="wrap">긴 문장은 class="wrap"</td></tr>
+            <tr class="row-hi"><td class="scope-name">강조행</td><td class="no">X</td><td class="wrap">핵심 행에만</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cap">표나 그림 아래 한 줄 설명.</p>
+
+      <!-- 콜아웃 3종: 기본(파랑) / is-key(황동, 핵심 개념) / is-warn(빨강, 함정) -->
+      <div class="note">
+        <p class="note-title">직접 확인한 사실 <span class="badge">실측 확인</span></p>
+        <p>내가 실제로 돌려서 본 것에만 이 배지를 붙인다. 추론에는 붙이지 않는다.</p>
+      </div>
+
+      <div class="note is-key">
+        <p class="note-title">기억할 규칙</p>
+        <p>이 글에서 가장 오래 남아야 할 한 가지.</p>
+      </div>
+
+      <div class="note is-warn">
+        <p class="note-title">함정</p>
+        <p>똑같이 당하기 쉬운 지점.</p>
+      </div>
+    </section>
+
+    <section id="s2">
+      <h2><span class="num">02</span><span>두 번째 절 제목</span></h2>
+      <p class="lede">한 문장.</p>
+
+      <!-- 두 대상을 맞세울 때 -->
+      <div class="versus">
+        <div class="vcard is-new">
+          <h4>권장하는 쪽</h4>
+          <dl><dt>항목</dt><dd>값</dd></dl>
+        </div>
+        <div class="vcard is-old">
+          <h4>문제가 되는 쪽</h4>
+          <dl><dt>항목</dt><dd>값</dd></dl>
+        </div>
+      </div>
+
+      <!-- 순서·우선순위가 결과를 가를 때 -->
+      <div class="order">
+        <div class="order-row is-win"><span class="order-idx">1</span><span class="order-name">이긴 것 <span class="order-tag">채택됨</span></span></div>
+        <div class="order-row is-lose"><span class="order-idx">2</span><span class="order-name">가려진 것</span></div>
+      </div>
+      <p class="cap">왜 이 순서가 결과를 갈랐는지.</p>
+    </section>
+
+    <hr class="rule">
+
+    <div class="closing">
+      <h2><span class="num">■</span><span>기억할 것</span></h2>
+      <ol>
+        <li><strong>한 줄 요약.</strong> 부연 한 문장.</li>
+      </ol>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
