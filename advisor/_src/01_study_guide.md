@@ -347,7 +347,7 @@ FROM evaluation_schedule_config;
 |---|---|
 | `ai/execution/` | AI 호출 실행 |
 | `ai/prompt/` | 프롬프트 관리 |
-| `ai/routing/` | 모델 선택·폴백 |
+| `ai/execution/routing/` | 모델 선택·폴백 (정책·후보 순서·시도 이력). `ai/routing/` 은 채팅용 Smart Routing 넷뿐이고 기본 꺼져 있다 (2026-10-12 정정) |
 
 ### 5단계 — `rag` (274) → `kms` (774)
 
