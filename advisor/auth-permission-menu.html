@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="요청 하나가 통과하는 관문 3개. 필터는 신원을 채우고, URL 매트릭스가 막고, &#x27;본인 것만&#x27;은 서비스 코드가 맡는다. 401·403·안 보이는 메뉴가 전부 설명된다.">
+<meta name="description" content="요청 하나가 지나는 문 셋. 필터는 이름을 적고, URL 매트릭스가 막고, &#x27;자기 것만&#x27;은 서비스 코드가 맡는다. 401·403·안 보이는 메뉴가 그 셋으로 설명된다.">
 <title>인증 · 권한 · 메뉴 체계</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +37,7 @@
     <p class="eyebrow">Spring Security · 구조 해설 · 0단계</p>
     <h1>인증 · 권한 · 메뉴 체계</h1>
     <p class="standfirst">
-      요청 하나가 컨트롤러에 닿기까지 관문 세 개를 지난다. 필터는 신원을 채우기만 하고, 차단은 URL 매트릭스가 하며, <strong>'본인 것만'</strong>은 어떤 애너테이션도 표현하지 못해 서비스 코드가 맡는다. 이 세 축을 분리해서 보면 401·403·안 보이는 메뉴가 전부 설명된다.
+      처음 이 저장소의 보안 설정을 열었을 때 나는 요청을 막는 코드를 찾고 있었다. 필터에는 그런 코드가 없었다. 필터는 이름을 적을 뿐이고, 막는 건 뒤에 선 문이고, <strong>'자기 것만'</strong>은 어떤 애너테이션도 말할 줄 몰라 서비스 코드가 맡는다. 이 셋을 따로 놓고 보면 401 과 403 과 안 보이는 메뉴가 전부 한 그림 안에 들어온다.
     </p>
 
     <div class="meta-strip">
@@ -47,14 +47,14 @@
     </div>
 
       <div class="note">
-        <p class="note-title">2026-10-12 갱신 요지.</p>
-        <p>7월 문서와 달라진 큰 것 세 가지. ① <code>@PreAuthorize("hasRole('ADMIN')")</code> 467건이 <strong>1건</strong>으로 줄었다. API 인가는 <code>isAuthenticated()</code> 와 <code>hasFeature()</code> 로 이관됐다(CRITICAL 19 · 27). ② 메뉴는 BE <code>menu-definition.json</code> 이 SSOT 가 됐고, FE <code>menu.ts</code> 는 구현 레지스트리만 갖는다(CRITICAL 20). BE ↔ FE 매칭은 <strong>code 가 아니라 path</strong> 다. ③ Vue 트랙(<code>stt-client/</code>)은 삭제됐다. 7절의 Vue 비교는 통째로 뺐다.</p>
+        <p class="note-title">갱신 요지</p>
+        <p>7월 초판과 가장 크게 달라진 세 가지. <code>hasRole('ADMIN')</code> 467건이 1건이 됐고(CRITICAL 19 · 27), 메뉴의 원본이 BE <code>menu-definition.json</code> 으로 넘어가 FE 는 레지스트리만 갖게 됐으며(CRITICAL 20) 둘을 잇는 열쇠는 code 가 아니라 path 다. Vue 트랙은 삭제돼서 7절의 Vue 비교는 통째로 뺐다.</p>
       </div>
 
     <section id="s1">
       <h2><span class="num">01</span><span>전체 그림</span></h2>
-      <p class="lede">요청 하나가 통과하는 관문 3개와, 인증·행위·범위라는 세 축.</p>
-      <p>요청 하나가 처리되기까지 <strong>3개의 관문</strong>을 통과한다.</p>
+      <p class="lede">문이 셋이다. 셋이 묻는 질문이 전부 다르다.</p>
+      <p>요청 하나가 컨트롤러에 닿기까지 문을 셋 지난다. 성 하나에 문이 셋 있는 셈인데, 셋이 묻는 질문이 전부 다르다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>HTTP 요청
@@ -74,27 +74,25 @@
    ▼
 컨트롤러 / 서비스 본문</pre>
       </div>
-      <h3>핵심 원칙</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>축</th><th>질문</th><th>판정 위치</th></tr></thead>
           <tbody>
-            <tr><td><strong>인증</strong></td><td>누구인가</td><td><code>JwtAuthenticationFilter</code></td></tr>
-            <tr><td><strong>행위(Action)</strong></td><td>무엇을 할 수 있나</td><td class="wrap"><code>@PreAuthorize</code> — 지금은 거의 전부 <code>isAuthenticated()</code>, 파괴적 행위만 <code>hasFeature()</code></td></tr>
-            <tr><td><strong>범위(Scope)</strong></td><td><em>누구의</em> 데이터에</td><td><strong>서비스/쿼리 코드</strong></td></tr>
+            <tr><td>인증</td><td>누구인가</td><td><code>JwtAuthenticationFilter</code></td></tr>
+            <tr><td>행위(Action)</td><td>무엇을 할 수 있나</td><td class="wrap"><code>@PreAuthorize</code> — 지금은 거의 전부 <code>isAuthenticated()</code>, 파괴적 행위만 <code>hasFeature()</code></td></tr>
+            <tr><td>범위(Scope)</td><td>누구의 데이터에</td><td>서비스/쿼리 코드</td></tr>
           </tbody>
         </table>
       </div>
       <div class="note is-warn">
-        <p class="note-title"><code>@PreAuthorize</code> 는 범위(Scope)를 표현하지 못한다.</p>
-        <p>"수정 가능"은 되지만 "본인 것만 수정 가능"은 안 된다. 범위는 항상 코드에서 처리한다.</p>
+        <p class="note-title"><code>@PreAuthorize</code> 는 범위를 말할 줄 모른다.</p>
+        <p>"수정할 수 있다"까지는 말해도 "자기 것만 수정할 수 있다"는 못 한다. 범위는 언제나 코드가 맡는다. 이 문장을 모르면 뒤의 8절이 전부 이상하게 읽힌다.</p>
       </div>
     </section>
     <section id="s2">
       <h2><span class="num">02</span><span>인증 — JwtAuthenticationFilter</span></h2>
-      <p class="lede">토큰을 읽어 신원을 채우되 차단은 하지 않는 필터. 401 과 403 이 갈리는 지점.</p>
-      <p><strong>파일</strong>: <code>core/security/JwtAuthenticationFilter.java</code> (343줄) 전체 코드베이스에서 가성비가 가장 높은 파일. 모든 요청이 여기를 통과한다. 7월의 102줄에서 343줄로 늘었다. 늘어난 것은 <strong>계정 회수(삭제·영구 정지) 판정</strong>과 <strong>ASYNC 디스패치에서의 SecurityContext 정리</strong>(94·119·233줄)다. 핵심 흐름은 그대로다.</p>
-      <h3>동작</h3>
+      <p class="lede">이름을 적되 막지는 않는 필터. 401 과 403 이 갈리는 자리.</p>
+      <p><code>core/security/JwtAuthenticationFilter.java</code>, 343줄. 모든 요청이 이 파일을 지나간다. 7월에는 102줄이었는데 그 사이 계정이 삭제되거나 영구 정지된 경우를 토큰 만료와 따로 다루는 판정이 들어왔고, ASYNC 디스패치에서 <code>SecurityContext</code> 를 정리하는 코드(94·119·233줄)가 붙었다. 뼈대는 그대로다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>① 토큰 추출 (resolveToken, 322줄)
@@ -114,25 +112,25 @@
 ⑤ 토큰이 없거나 틀려도 여기서 막지 않는다 → filterChain.doFilter() 로 통과</pre>
       </div>
       <div class="note is-key">
-        <p class="note-title">⑤ 가 핵심이다.</p>
-        <p>이 필터는 <strong>"인증 정보를 채워주는" 역할</strong>이지 <strong>"차단하는" 역할이 아니다.</strong> 실제 차단은 다음 단계인 URL 매트릭스가 한다.</p>
+        <p class="note-title">⑤가 이 파일의 성격이다.</p>
+        <p>필터는 문지기가 아니라 명부를 든 안내인이다. 이름을 확인해 적어 둘 뿐이고, 들여보낼지는 뒤에 선 문이 정한다. 그 문이 URL 매트릭스다.</p>
       </div>
-      <h3>401 vs 403 구분</h3>
+      <h3>401 과 403</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>응답</th><th>의미</th><th>원인</th></tr></thead>
           <tbody>
-            <tr><td><strong>401</strong> Unauthorized</td><td>신원 자체가 없음</td><td class="wrap">토큰 미첨부 / 만료 / 위조 → SecurityContext 가 비어 있음</td></tr>
-            <tr><td><strong>403</strong> Forbidden</td><td>신원은 있으나 권한 부족</td><td>로그인은 했지만 기능 권한 미달</td></tr>
+            <tr><td>401 Unauthorized</td><td>신원 자체가 없음</td><td class="wrap">토큰 미첨부 / 만료 / 위조 → SecurityContext 가 비어 있음</td></tr>
+            <tr><td>403 Forbidden</td><td>신원은 있으나 권한 부족</td><td>로그인은 했지만 기능 권한 미달</td></tr>
           </tbody>
         </table>
       </div>
-      <p><strong>401이면 토큰 문제, 403이면 권한 문제.</strong> 401인데 토큰을 보냈다면 만료됐거나 <code>Bearer </code> 접두사 누락이 대부분이다.</p>
+      <p>401 이면 토큰 문제이고 403 이면 권한 문제다. 토큰을 분명히 보냈는데 401 이 온다면 대개 만료됐거나 <code>Bearer </code> 접두사가 빠진 것이다.</p>
     </section>
     <section id="s3">
       <h2><span class="num">03</span><span>1차 관문 — URL 매트릭스 (SecurityConfig)</span></h2>
-      <p class="lede">URL 매트릭스의 다섯 가지 핵심 개념. 순서가 곧 로직이다.</p>
-      <h3>프로파일별로 파일이 3개다</h3>
+      <p class="lede">순서가 곧 로직이다. 좁은 규칙이 위, 넓은 규칙이 아래.</p>
+      <h3>프로파일별로 파일이 셋이다</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>파일</th><th>줄 수</th><th>적용 프로파일 (<code>@Profile</code>)</th></tr></thead>
@@ -143,24 +141,22 @@
           </tbody>
         </table>
       </div>
-      <p><strong>본인이 쓰는 프로파일 것 하나만 본다.</strong> 셋 다 보면 헷갈린다. 아래 줄 번호는 전부 <code>LocalSecurityConfig</code> 기준이다.</p>
+      <p>자기 프로파일 것 하나만 본다. 아래 줄 번호는 전부 <code>LocalSecurityConfig</code> 기준이다.</p>
       <div class="note">
-        <p><code>LocalSecurityConfig</code> 클래스 주석(41줄)에 "JWT 인증 없이 기본 인증만 제공"이라고 적혀 있으나 <strong>사실이 아니다.</strong> 108·111줄에서 JWT 필터를 만들고 362줄에서 실제로 붙인다. 낡은 주석이다.</p>
+        <p>이 파일 41줄의 클래스 주석에는 "JWT 인증 없이 기본 인증만 제공"이라고 적혀 있다. 사실이 아니다. 108·111줄에서 JWT 필터를 만들고 362줄에서 체인에 붙인다. 주석이 코드보다 먼저 늙었다.</p>
       </div>
       <div class="note">
-        <p>239줄 주석 참고 — <strong>운영 환경이 local 프로파일로 구동된 이력</strong>이 있다. 이름만 Local 이지 실제 운영에서도 동작한다.</p>
+        <p>239줄 주석에 따르면 운영 환경이 local 프로파일로 구동된 이력이 있다. 이름만 Local 이지 운영에서도 돈다.</p>
       </div>
       <h3>핵심 개념 ① — 순서가 곧 로직 (first match wins)</h3>
-      <p>규칙은 <strong>위에서 아래로</strong> 검사되고, <strong>처음 매칭된 규칙 하나만</strong> 적용된다.</p>
+      <p>규칙은 위에서 아래로 읽히고, 처음 맞는 규칙 하나만 적용된다.</p>
       <div class="code">
         <div class="code-head">JAVA</div>
 <pre>.requestMatchers(HttpMethod.POST, "/api/stt/message").permitAll()   // 177줄
 .requestMatchers(HttpMethod.POST, "/api/stt/event").permitAll()     // 178줄
 .requestMatchers("/api/stt/**").authenticated()                     // 179줄</pre>
       </div>
-      <ul><li><code>POST /api/stt/message</code> → 177줄에서 걸림 → <strong>인증 불필요</strong></li><li><code>GET  /api/stt/events</code>  → 179줄에서 걸림 → <strong>인증 필요</strong></li></ul>
-      <p><strong>순서가 반대면 179줄이 전부를 먼저 잡아 177줄은 영원히 도달하지 못한다.</strong> → <strong>좁은 규칙(구체적)이 위, 넓은 규칙(<code>/**</code>)이 아래.</strong></p>
-      <p>같은 패턴 예시 (182·184줄):</p>
+      <p><code>POST /api/stt/message</code> 는 177줄에서 걸려 인증 없이 들어가고, <code>GET /api/stt/events</code> 는 179줄에서 걸려 로그인을 요구받는다. 순서를 뒤집으면 179줄이 전부를 먼저 삼켜서 177줄은 영원히 차례가 오지 않는다. 좁은 규칙이 위, 넓은 규칙이 아래. 182·184줄의 actuator 도 같은 모양이다.</p>
       <div class="code">
         <div class="code-head">JAVA</div>
 <pre>.requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()  // 좁게 열고
@@ -172,36 +168,36 @@
           <thead><tr><th>종결어</th><th>요구 조건</th><th>통과 대상</th><th>2026-10 사용 현황</th></tr></thead>
           <tbody>
             <tr><td class="scope-name"><code>permitAll()</code></td><td>없음</td><td>누구나 (비로그인 포함)</td><td>열어야 할 경로만</td></tr>
-            <tr><td class="scope-name"><code>authenticated()</code></td><td>로그인</td><td>로그인한 전원</td><td><strong>대부분</strong></td></tr>
-            <tr><td class="scope-name"><code>hasRole('ADMIN')</code></td><td>특정 역할</td><td>관리자만</td><td class="wrap"><code>/actuator/**</code> <strong>한 곳</strong> (Local 1 · Dev 1 · 운영 8건)</td></tr>
+            <tr><td class="scope-name"><code>authenticated()</code></td><td>로그인</td><td>로그인한 전원</td><td>대부분</td></tr>
+            <tr><td class="scope-name"><code>hasRole('ADMIN')</code></td><td>특정 역할</td><td>관리자만</td><td class="wrap"><code>/actuator/**</code> 한 곳 (Local 1 · Dev 1 · 운영 8건)</td></tr>
           </tbody>
         </table>
       </div>
-      <p>API 경로에 <code>hasRole</code> 을 새로 추가하지 않는다 — 인가는 인증 여부로만 하고, 세부 권한은 2차 관문(<code>hasFeature</code>)과 서비스 범위로 내린다(CRITICAL 19).</p>
+      <p>API 경로에 <code>hasRole</code> 을 새로 쓰지 않는다. 인가는 인증 여부로만 하고, 세부 권한은 2차 관문의 <code>hasFeature</code> 와 서비스 범위로 내린다(CRITICAL 19).</p>
       <h3>핵심 개념 ③ — 기본은 잠금</h3>
       <div class="code">
         <div class="code-head">JAVA</div>
 <pre>.anyRequest().authenticated()   // 357줄 — 마지막 그물</pre>
       </div>
-      <p>위에서 안 걸린 요청은 <strong>전부 인증 필요</strong>. 새 API 를 만들면 아무 설정 없이도 자동으로 보호된다. 열고 싶을 때만 위에 명시적으로 추가하는 구조다.</p>
+      <p>위에서 안 걸린 요청은 전부 로그인을 요구받는다. 새 API 를 만들면 아무 설정 없이도 보호되고, 열고 싶을 때만 위에 한 줄을 더한다. 문은 기본으로 닫혀 있다.</p>
       <h3>핵심 개념 ④ — <code>permitAll</code> ≠ 무방비</h3>
-      <p><code>permitAll</code> 목록만 보면 "다 뚫려 있다" 싶지만, <strong>대부분 다른 방식으로 지켜진다.</strong></p>
+      <p><code>permitAll</code> 목록만 보면 성벽에 구멍이 숭숭 뚫린 것 같다. 대부분은 다른 사람이 지키고 있다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>경로</th><th>줄</th><th>Spring Security</th><th>실제 방어</th></tr></thead>
           <tbody>
-            <tr><td class="scope-name"><code>/api/v1/chat/**</code></td><td>324</td><td>permitAll</td><td class="wrap"><strong>VoiceApiKeyFilter</strong> (API Key)</td></tr>
-            <tr><td class="scope-name"><code>POST /api/agent/register</code></td><td>228</td><td>permitAll</td><td class="wrap"><strong>AgentApiKeyFilter</strong> (API Key)</td></tr>
+            <tr><td class="scope-name"><code>/api/v1/chat/**</code></td><td>324</td><td>permitAll</td><td class="wrap">VoiceApiKeyFilter (API Key)</td></tr>
+            <tr><td class="scope-name"><code>POST /api/agent/register</code></td><td>228</td><td>permitAll</td><td class="wrap">AgentApiKeyFilter (API Key)</td></tr>
             <tr><td class="scope-name"><code>/ws-ssh</code></td><td>187</td><td>permitAll</td><td>핸들러가 쿼리파라미터 JWT 직접 검증</td></tr>
-            <tr><td class="scope-name wrap"><code>POST /api/orchestration/webhooks/*/trigger</code></td><td>307</td><td>permitAll</td><td><strong>HMAC 서명</strong></td></tr>
-            <tr><td class="scope-name"><code>POST /api/kms/slack/**</code></td><td>248</td><td>permitAll</td><td><strong>HMAC 서명</strong></td></tr>
+            <tr><td class="scope-name wrap"><code>POST /api/orchestration/webhooks/*/trigger</code></td><td>307</td><td>permitAll</td><td>HMAC 서명</td></tr>
+            <tr><td class="scope-name"><code>POST /api/kms/slack/**</code></td><td>248</td><td>permitAll</td><td>HMAC 서명</td></tr>
           </tbody>
         </table>
       </div>
-      <p>즉 <code>permitAll</code> = <strong>"Spring Security 단계는 통과시키고, 인증은 다른 곳에서 한다"</strong>. (7월 표에 있던 <code>/api/artifact/pptx/*/callback</code> 은 세 설정 어디에도 남아 있지 않다.)</p>
-      <h3>핵심 개념 ⑤ — 왜 열어야 하는가 (패턴 5가지)</h3>
-      <ol><li><strong>로그인 전이라 토큰이 없음</strong> — <code>/api/auth/**</code> (144줄)</li><li><strong>브라우저가 헤더를 못 붙임</strong> ← 가장 흔한 이유<ul><li><code>&lt;img src&gt;</code> → 아바타 이미지</li><li><code>&lt;audio&gt;</code> → 녹취 스트리밍</li><li><code>iframe</code> → embed</li><li><code>EventSource</code> → SSE</li></ul></li><li><strong>내부 시스템 통신</strong> — Bridge 소프트폰, ACS 릴레이</li><li><strong>외부 시스템 콜백</strong> — 웹훅, Slack</li><li><strong>정적 자원</strong> — <code>/react/**</code>, <code>/assets/**</code></li></ol>
-      <h3>필터 등록 (LocalSecurityConfig 362~384줄)</h3>
+      <p><code>permitAll</code> 은 "Spring Security 단계는 통과시키고 인증은 다른 곳에서 한다"는 뜻이다. 7월 표에 있던 <code>/api/artifact/pptx/*/callback</code> 은 세 설정 어디에도 남아 있지 않아 지웠다.</p>
+      <h3>핵심 개념 ⑤ — 왜 열어야 하는가</h3>
+      <ol><li>로그인 전이라 토큰이 없다 — <code>/api/auth/**</code> (144줄)</li><li>브라우저가 헤더를 못 붙인다 — <code>&lt;img src&gt;</code> 아바타, <code>&lt;audio&gt;</code> 녹취 스트리밍, <code>iframe</code> embed, <code>EventSource</code> SSE. 가장 흔한 이유다</li><li>내부 시스템 통신 — Bridge 소프트폰, ACS 릴레이</li><li>외부 시스템 콜백 — 웹훅, Slack</li><li>정적 자원 — <code>/react/**</code>, <code>/assets/**</code></li></ol>
+      <h3>필터 등록 (362~384줄)</h3>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>362  addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter)   JWT 검증 → SecurityContext 채움
@@ -215,13 +211,13 @@
      컨트롤러</pre>
       </div>
       <div class="note">
-        <p>같은 기준점(<code>UsernamePasswordAuthenticationFilter</code> 앞)에 여러 필터를 거는 구조라, <strong>실제 실행 순서는 기동 로그의 <code>DefaultSecurityFilterChain</code> 출력으로 확인</strong>한다. 7월 문서의 "Voice → VKey → JWT → Embed" 순서는 실측이 아니었다.</p>
+        <p>여러 필터가 같은 기준점(<code>UsernamePasswordAuthenticationFilter</code> 앞)에 걸려 있어서, 실제 실행 순서는 기동 로그의 <code>DefaultSecurityFilterChain</code> 출력으로 확인해야 한다. 7월 문서에 적었던 "Voice → VKey → JWT → Embed" 순서는 실측이 아니었다. 이번에 그 줄을 지웠다.</p>
       </div>
     </section>
     <section id="s4">
       <h2><span class="num">04</span><span>로그인 흐름</span></h2>
-      <p class="lede">SecurityConfig 는 토큰을 만들지 않는다. 로그인 요청이 지나가는 길.</p>
-      <p><code>SecurityConfig</code> 는 <strong>토큰을 만들지 않는다.</strong> 두 가지 역할만 한다.</p>
+      <p class="lede">SecurityConfig 는 토큰을 만들지 않는다. 그런데 로그인 요청은 이 설정을 지나간다.</p>
+      <p><code>SecurityConfig</code> 는 토큰을 만들지 않는다. 그런데 로그인 요청은 분명 이 설정을 지나간다. 두 가지 일만 한다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>POST /api/auth/login  { username, password }
@@ -250,21 +246,20 @@
         <table>
           <thead><tr><th>질문</th><th>답</th></tr></thead>
           <tbody>
-            <tr><td class="wrap">로그인 요청이 SecurityConfig 를 타나?</td><td><strong>예</strong> — <code>permitAll</code> 로 통과</td></tr>
-            <tr><td class="wrap">SecurityConfig 가 ID/PW 를 검증하나?</td><td><strong>간접적</strong> — 검증용 빈 3개를 제공</td></tr>
-            <tr><td class="wrap">SecurityConfig 가 JWT 를 만드나?</td><td class="wrap"><strong>아니오</strong> — <code>JwtTokenProvider</code> 가 만듦</td></tr>
-            <tr><td class="wrap">JwtAuthenticationFilter 가 관여하나?</td><td><strong>아니오</strong> — 검증할 토큰이 아직 없음</td></tr>
+            <tr><td class="wrap">로그인 요청이 SecurityConfig 를 타나?</td><td>예 — <code>permitAll</code> 로 통과</td></tr>
+            <tr><td class="wrap">SecurityConfig 가 ID/PW 를 검증하나?</td><td>간접적 — 검증용 빈 3개를 제공</td></tr>
+            <tr><td class="wrap">SecurityConfig 가 JWT 를 만드나?</td><td class="wrap">아니오 — <code>JwtTokenProvider</code> 가 만듦</td></tr>
+            <tr><td class="wrap">JwtAuthenticationFilter 가 관여하나?</td><td>아니오 — 검증할 토큰이 아직 없음</td></tr>
           </tbody>
         </table>
       </div>
-      <p><strong>두 번째 요청부터</strong>가 JWT 필터의 무대다.</p>
-      <p>관련 메모:</p>
-      <ul><li>액세스 토큰 만료 1시간 → <code>POST /api/auth/refresh</code> (433줄) 로 갱신</li><li><code>user.handleLoginSuccess(clientIp)</code> (137줄) 가 로그인 실패 카운터를 리셋</li><li>계정 잠금 해제(수동): <code>UPDATE users SET loginFailCount=0, accountNonLocked=1 WHERE username='&lt;username&gt;';</code> (컬럼은 camelCase)</li></ul>
+      <p>JWT 필터의 무대는 두 번째 요청부터다. 첫 요청에서 안내인은 빈 명부를 들고 서 있을 뿐이다.</p>
+      <p>액세스 토큰은 한 시간 뒤 만료되고 <code>POST /api/auth/refresh</code> (433줄)로 갱신한다. 로그인에 성공하면 <code>user.handleLoginSuccess(clientIp)</code> (137줄)가 실패 카운터를 0으로 돌린다. 계정이 잠겼을 때 손으로 푸는 쿼리는 <code>UPDATE users SET loginFailCount=0, accountNonLocked=1 WHERE username='&lt;username&gt;';</code> 이고, 컬럼이 camelCase 라는 점만 기억하면 된다.</p>
     </section>
     <section id="s5">
       <h2><span class="num">05</span><span>2차 관문 — @PreAuthorize</span></h2>
-      <p class="lede">메서드 단위 인가. 역할 기반과 권한 기반을 언제 고르는가.</p>
-      <p><strong>403개 파일</strong>에서 사용 중. 표현식 빈도 (2026-10-12 실측):</p>
+      <p class="lede">7월에 467건이던 hasRole 이 1건이 됐다. 그 사이에 무엇이 저장소를 지나갔나.</p>
+      <p>403개 파일에서 쓴다. 표현식을 세어 보면 아래와 같다 (2026-10-12).</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>사용 횟수</th><th>표현식</th></tr></thead>
@@ -275,25 +270,22 @@
             <tr><td>20</td><td><code>permitAll()</code></td></tr>
             <tr><td>1 · 1</td><td class="wrap"><code>hasAnyFeature(...)</code> · <code>hasAllFeatures(...)</code></td></tr>
             <tr><td>1</td><td class="wrap"><code>hasMenuPermission('admin')</code></td></tr>
-            <tr><td><strong>1</strong></td><td><code>hasRole('ADMIN')</code></td></tr>
+            <tr><td>1</td><td><code>hasRole('ADMIN')</code></td></tr>
           </tbody>
         </table>
       </div>
-      <div class="note">
-        <p>7월엔 <code>hasRole('ADMIN')</code> 467건이 1위였고 <code>hasRole('ADMIN') or hasMenuPermission(...)</code> 패턴이 33건 있었다. <strong>전부 이관됐다.</strong> 지금의 규칙은 "API 인가는 인증 여부로만, role 하드코딩 금지"(CRITICAL 19)와 "role 판정을 기능 권한으로 옮길 때는 같은 범위 · 관리자 단축 없음 · 호출부 전수"(CRITICAL 27)다.</p>
-      </div>
-      <h3><code>isAuthenticated()</code> 의 의미</h3>
-      <p><strong>"로그인만 되어 있으면 통과"</strong> — 역할도 권한도 보지 않는다. <code>JwtAuthenticationFilter</code> 가 SecurityContext 를 채웠는지만 확인한다.</p>
-      <p>이것이 기본값인 이유: <strong>누가 무엇을 볼 수 있는지는 메뉴 매트릭스(DB)와 서비스 범위가 정한다.</strong> 컨트롤러는 "로그인했나"만 묻는다. 단 <code>permitAll()</code> 은 안 된다 — <strong>"본인"을 특정할 수 없기 때문이다.</strong></p>
+      <p>7월에 이 표를 처음 만들었을 때 1위는 <code>hasRole('ADMIN')</code> 467건이었고, <code>hasRole('ADMIN') or hasMenuPermission(...)</code> 패턴이 33건 있었다. 석 달 뒤 다시 세었더니 한 건이 남아 있었다. 그 사이에 "API 인가는 인증 여부로만, role 하드코딩 금지"(CRITICAL 19)와 "role 판정을 기능 권한으로 옮길 때는 같은 범위 · 관리자 단축 없음 · 호출부 전수"(CRITICAL 27)가 저장소 전체를 한 번 지나간 것이다.</p>
+      <h3><code>isAuthenticated()</code> 의 뜻</h3>
+      <p>로그인만 되어 있으면 통과. 역할도 권한도 보지 않고, <code>JwtAuthenticationFilter</code> 가 명부에 이름을 적었는지만 본다. 이것이 기본값이 된 이유는 간단하다. 누가 무엇을 볼 수 있는지는 메뉴 매트릭스(DB)와 서비스의 범위 판정이 정하기 때문에, 컨트롤러는 "로그인했나"만 물으면 된다. 다만 <code>permitAll()</code> 로 내려가서는 안 된다. 그러면 "본인"이 누구인지 알 길이 없어진다.</p>
       <h3>커스텀 함수 (Spring 표준 아님)</h3>
-      <p><strong>정의</strong>: <code>permission/security/CustomMethodSecurityExpressionRoot.java</code></p>
+      <p>정의는 <code>permission/security/CustomMethodSecurityExpressionRoot.java</code> 에 있다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>함수</th><th>줄</th><th>용도</th><th>판정 근거</th></tr></thead>
           <tbody>
-            <tr><td class="scope-name"><code>hasFeature(코드)</code></td><td>65</td><td>기능 권한</td><td><strong>DB 조회</strong> (캐시)</td></tr>
+            <tr><td class="scope-name"><code>hasFeature(코드)</code></td><td>65</td><td>기능 권한</td><td>DB 조회 (캐시)</td></tr>
             <tr><td class="scope-name wrap"><code>hasAnyFeature(...)</code> / <code>hasAllFeatures(...)</code></td><td>118 / 138</td><td>복수 검사</td><td>DB 조회</td></tr>
-            <tr><td class="scope-name"><code>hasMenuPermission(코드)</code></td><td>47</td><td>메뉴 접근</td><td class="wrap">DB 조회 — <strong>지금은 코드에서 1곳만 쓴다</strong></td></tr>
+            <tr><td class="scope-name"><code>hasMenuPermission(코드)</code></td><td>47</td><td>메뉴 접근</td><td>DB 조회 — 지금은 코드에서 한 곳만 쓴다</td></tr>
           </tbody>
         </table>
       </div>
@@ -305,7 +297,7 @@ consultation:history:view:own      본인 열람
 consultation:history:delete:all    전체 삭제    ← 누구에게 줄지가 DB 데이터
 counsel-type:reclassify:apply      재분류 적용</pre>
       </div>
-      <p><code>도메인:자원:행위[:범위]</code>. <strong>범위까지 코드에 인코딩</strong>하면 <code>ADMIN</code>/<code>SUPERVISOR</code> 같은 역할명이 소스에서 사라지고, 요구사항이 바뀌면 <strong>DB(역할 ↔ 권한 매핑)만 수정</strong>하면 된다.</p>
+      <p><code>도메인:자원:행위[:범위]</code>. 범위까지 코드에 넣어 두면 <code>ADMIN</code> 이나 <code>SUPERVISOR</code> 같은 역할 이름이 소스에서 사라진다. 요구사항이 바뀌면 역할과 권한을 잇는 DB 행만 고치면 되고, 배포는 필요 없다.</p>
       <h3>선택 기준</h3>
       <div class="table-wrap">
         <table>
@@ -313,17 +305,15 @@ counsel-type:reclassify:apply      재분류 적용</pre>
           <tbody>
             <tr><td>조회·일반 행위</td><td class="wrap"><code>isAuthenticated()</code> + 서비스에서 범위</td></tr>
             <tr><td>삭제·승인·적용처럼 되돌리기 어려운 행위</td><td><code>hasFeature('…')</code></td></tr>
-            <tr><td>메뉴 진입 가부</td><td>컨트롤러가 아니라 <strong>메뉴 매트릭스</strong>(7절)</td></tr>
+            <tr><td>메뉴 진입 가부</td><td>컨트롤러가 아니라 메뉴 매트릭스 (7절)</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="note">
-        <p>역할(<code>hasRole</code>)로 막고 싶어지면 "6개월 뒤 고객이 이걸 바꿔달라고 할까?"를 묻는다. 거의 항상 '예'이고, 그러면 기능 권한이다.</p>
-      </div>
+      <p>역할로 막고 싶어지는 순간이 온다. 그때 "여섯 달 뒤 고객이 이걸 바꿔 달라고 할까"를 물어보면 거의 언제나 '예'다. 그러면 기능 권한이다.</p>
     </section>
     <section id="s6">
       <h2><span class="num">06</span><span>권한 데이터 구조</span></h2>
-      <p class="lede">users 에서 menus 까지 이어지는 테이블 사슬과 확인 SQL.</p>
+      <p class="lede">users 에서 menus 까지 이어지는 사슬. 메뉴 권한과 기능 권한은 같은 서랍에 있다.</p>
       <h3>테이블 사슬</h3>
       <div class="code">
         <div class="code-head">도식</div>
@@ -339,8 +329,8 @@ counsel-type:reclassify:apply      재분류 적용</pre>
                            └─ menus              실제 메뉴. menu-definition.json 에서 기동 시 동기화</pre>
       </div>
       <div class="note is-key">
-        <p class="note-title">기억할 규칙</p>
-        <p><strong>메뉴 권한과 기능 권한이 같은 <code>permissions</code> 테이블에 <code>permission_type</code> 으로 구분되어 들어 있다.</strong></p>
+        <p class="note-title">서랍은 하나, 칸은 둘.</p>
+        <p><code>permissions</code> 테이블 하나에 <code>permission_type</code> 으로 칸만 나뉘어 있을 뿐이다. 이걸 모르면 "메뉴 권한은 어느 테이블이냐"를 한참 찾게 된다.</p>
       </div>
       <h3>권한 판정 코드 — <code>DynamicPermissionServiceImpl</code></h3>
       <div class="code">
@@ -358,7 +348,7 @@ public boolean hasMenuAccess(String username, String menuCode) {                
 
 @CacheEvict(value = {"userPermissions", "userMenus"}, ...)                                         // 172 · 181줄</pre>
       </div>
-      <p><code>hasFeature</code> 는 ①의 집합에 코드가 있는지, <code>hasMenuPermission</code> 은 ②의 집합에 있는지 본다. 둘 다 <strong>사용자별 캐시</strong>를 탄다 — 9절 함정 1.</p>
+      <p><code>hasFeature</code> 는 ①의 집합에 코드가 있는지, <code>hasMenuPermission</code> 은 ②의 집합에 있는지 본다. 둘 다 사용자별 캐시를 탄다. 캐시는 기억이고, 기억은 DB 를 직접 고쳐도 저절로 바뀌지 않는다. 9절의 첫 번째 함정이 여기서 나온다.</p>
       <h3>확인 SQL</h3>
       <div class="code">
         <div class="code-head">SQL</div>
@@ -369,7 +359,7 @@ SELECT id, code, name, is_active, priority FROM dynamic_roles;
 SELECT r.code, r.name FROM dynamic_roles r
 JOIN user_dynamic_roles ur ON ur.role_id = r.id
 JOIN users u ON u.id = ur.user_id
-WHERE u.username = 'admin';
+WHERE u.username = '&lt;username&gt;';
 
 <span class="c-dim">-- 접근 가능 메뉴 코드 = 사이드바에 보이는 메뉴</span>
 SELECT DISTINCT m.code, m.name
@@ -379,7 +369,7 @@ JOIN dynamic_roles r       ON r.id = ur.role_id
 JOIN role_permissions rp   ON rp.role_id = r.id
 JOIN permissions p         ON p.id = rp.permission_id
 JOIN menus m               ON m.id = p.menu_id
-WHERE u.username = 'admin'
+WHERE u.username = '&lt;username&gt;'
   AND p.permission_type = 'MENU'
   AND p.is_active = 1;
 
@@ -390,7 +380,7 @@ WHERE permission_type &lt;&gt; 'MENU' LIMIT 20;</pre>
     </section>
     <section id="s7">
       <h2><span class="num">07</span><span>메뉴 체계</span></h2>
-      <p class="lede">BE JSON 이 SSOT 가 된 뒤의 역할 분담, 그리고 두 곳을 잇는 접착제인 path.</p>
+      <p class="lede">메뉴의 원본은 BE JSON 이 됐고, 두 곳을 잇는 열쇠는 path 다.</p>
       <h3>역할 분담 (CRITICAL 20, 2026-08-05 확정)</h3>
       <div class="code">
         <div class="code-head">도식</div>
@@ -408,8 +398,8 @@ FE  web-react/src/config/menu.ts                    "그 path 를 어느 컴포�
           </tbody>
         </table>
       </div>
-      <p><strong>무엇을 보여줄지(존재·계층·순서·라벨·노출)는 BE 가 정하고, FE 는 "그 path 를 어떻게 그릴지"만 안다.</strong> 7월 문서의 "FE 하드코딩은 불가피하다"는 절반만 맞았다 — <code>lazy: () =&gt; import(...)</code> 와 아이콘은 여전히 FE 에 있어야 하지만(번들러가 빌드 타임에 정적 분석해야 코드 스플리팅이 된다), <strong>label·order·계층·permission 은 FE 에서 뺐다.</strong></p>
-      <h3>FE 가 메뉴를 받는 경로</h3>
+      <p>무엇을 보여줄지(존재·계층·순서·라벨·노출)는 BE 가 정하고, FE 는 그 path 를 어떻게 그릴지만 안다. 7월 문서에 "FE 하드코딩은 불가피하다"고 썼는데 절반만 맞았다. <code>lazy: () =&gt; import(...)</code> 와 아이콘은 여전히 FE 에 있어야 한다. 번들러가 빌드 시점에 import 를 읽어야 코드 스플리팅이 되기 때문이다. 하지만 label 과 order 와 계층과 permission 은 FE 에서 빠졌다.</p>
+      <h3>FE 가 메뉴를 받는 길</h3>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>로그인
@@ -419,52 +409,48 @@ FE  web-react/src/config/menu.ts                    "그 path 를 어느 컴포�
   → Sidebar.tsx (148줄) · HomePage · CommandPalette 렌더
   → 라우트 진입은 allowedPaths 로 판정</pre>
       </div>
-      <ul><li>매칭은 <strong>path 기준</strong>이다. code 는 접두사가 달라도(<code>MENU_BILLING_DASHBOARD</code> ↔ <code>BILLING_DASHBOARD</code>) 무해하다.</li><li>대응 화면이 없는 BE 메뉴는 <code>unresolved</code> 로 진단된다. 메뉴 관리 화면(<code>MenuManagementPage</code>, <code>MenuAlignmentSummary</code>)에서 볼 수 있다.</li><li>사이드바 서브탭은 <code>usePermission(sub.permission)</code> (Sidebar 777줄) 로 행마다 기능 권한을 검사한다.</li><li><code>App.tsx</code> 의 <code>&lt;Route&gt;</code> 는 18개(로그인·공유 링크·공개 페이지 등)뿐이고, 로그인 후 URL 은 <code>WorkspaceShell</code> 이 받아 <code>MENU_TREE</code> 에서 매칭한다. <strong>멀티탭 UI</strong> 때문이다.</li></ul>
-      <h3><code>path</code> 가 접착제다</h3>
+      <p>매칭은 path 기준이라 code 접두사가 달라도(<code>MENU_BILLING_DASHBOARD</code> 와 <code>BILLING_DASHBOARD</code>) 아무 일도 생기지 않는다. 대응 화면이 없는 BE 메뉴는 <code>unresolved</code> 로 표시되고, 메뉴 관리 화면(<code>MenuManagementPage</code>, <code>MenuAlignmentSummary</code>)에서 그 목록을 볼 수 있다. 사이드바의 서브탭은 <code>usePermission(sub.permission)</code> (Sidebar 777줄)로 한 줄씩 기능 권한을 확인한다. <code>App.tsx</code> 에 등록된 <code>&lt;Route&gt;</code> 는 로그인과 공유 링크, 공개 페이지 같은 18개뿐이고, 로그인 뒤의 URL 은 <code>WorkspaceShell</code> 이 받아 <code>MENU_TREE</code> 에서 찾는다. 멀티탭 UI 때문에 그렇게 됐다.</p>
+      <h3>path 가 접착제다</h3>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>menu-definition.json 의  path: '/agent/dashboard'
         ↕  반드시 일치
 menu.ts 의              path: '/agent/dashboard'  (+ icon, lazy)</pre>
       </div>
-      <p>두 곳의 path 가 어긋나면 <strong>에러 없이</strong> 메뉴가 안 보이거나 <code>unresolved</code> 로 남는다. 7월 문서는 "code 3곳 일치"라고 썼지만, 지금 FE <code>code:</code> 는 대부분 메뉴 code 체계와 다른 값(서브탭·라우트 키)이라 <strong>code 교집합은 17개뿐</strong>이다. 신경 쓸 것은 path 다.</p>
+      <p>두 곳의 path 가 어긋나면 에러 한 줄 없이 메뉴가 사라지거나 <code>unresolved</code> 로 남는다. 7월 문서는 "code 가 세 곳에서 일치해야 한다"고 썼다. 지금 FE 의 <code>code:</code> 는 대부분 메뉴 code 체계와 다른 값(서브탭이나 라우트 키)이라 code 교집합은 17개뿐이다. 신경 쓸 것은 path 하나다.</p>
       <h3>신규 메뉴 추가 절차</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>#</th><th>위치</th><th>배포 필요</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td class="wrap"><code>menu-definition.json</code> 에 노드 추가 (code · path · order · visible)</td><td><strong>BE 재기동</strong></td></tr>
-            <tr><td>2</td><td class="wrap"><code>menu.ts</code> 에 같은 path 로 <code>icon</code> / <code>lazy</code> 등록 + 페이지 컴포넌트</td><td><strong>FE 빌드</strong></td></tr>
+            <tr><td>1</td><td class="wrap"><code>menu-definition.json</code> 에 노드 추가 (code · path · order · visible)</td><td>BE 재기동</td></tr>
+            <tr><td>2</td><td class="wrap"><code>menu.ts</code> 에 같은 path 로 <code>icon</code> / <code>lazy</code> 등록 + 페이지 컴포넌트</td><td>FE 빌드</td></tr>
             <tr><td>3</td><td class="wrap">BE 기동 → <code>menus</code> 테이블 동기화 + <code>PERM_{코드}_ACCESS</code> 자동 생성</td><td>—</td></tr>
             <tr><td>4</td><td>권한 매트릭스 화면에서 역할별 부여</td><td>불필요 (DB)</td></tr>
           </tbody>
         </table>
       </div>
-      <p>한쪽만 하면 CI 가드가 막는다. 컨트롤러에는 <code>@PreAuthorize("isAuthenticated()")</code> 만 둔다 — 메뉴 권한을 컨트롤러에서 다시 검사하지 않는다.</p>
-      <div class="note">
-        <p class="note-title">"새 메뉴 만들기 = 배포 필요 / 기존 메뉴 권한 조정 = DB 만"</p>
-        <p>은 그대로다. 고객이 <em>"이 역할에게 이 메뉴 보여주세요"</em> 라고 하면 <strong>배포 불필요</strong>.</p>
-      </div>
+      <p>한쪽만 하면 CI 가드가 막는다. 컨트롤러에는 <code>@PreAuthorize("isAuthenticated()")</code> 만 둔다. 메뉴 권한을 컨트롤러에서 또 검사하지 않는다. 새 메뉴를 만드는 데는 배포가 필요하고 기존 메뉴의 권한을 조정하는 데는 DB 만 있으면 된다는 점은 7월과 같다. 고객이 "이 역할에게 이 메뉴 보여 주세요"라고 하면 배포 없이 끝난다.</p>
       <h3>고객사별 커스터마이징</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>요청</th><th>대응</th><th>배포</th></tr></thead>
           <tbody>
-            <tr><td>메뉴 <strong>이름</strong> 변경</td><td>JSON <code>name</code> / <code>titleKey</code></td><td>BE 재기동</td></tr>
-            <tr><td>메뉴 <strong>순서</strong> 변경</td><td>JSON <code>order</code></td><td>BE 재기동</td></tr>
-            <tr><td><strong>가시성</strong> 변경</td><td class="wrap">권한 매트릭스 (또는 JSON <code>visible</code>)</td><td><strong>불필요</strong></td></tr>
+            <tr><td>메뉴 이름 변경</td><td>JSON <code>name</code> / <code>titleKey</code></td><td>BE 재기동</td></tr>
+            <tr><td>메뉴 순서 변경</td><td>JSON <code>order</code></td><td>BE 재기동</td></tr>
+            <tr><td>가시성 변경</td><td class="wrap">권한 매트릭스 (또는 JSON <code>visible</code>)</td><td>불필요</td></tr>
             <tr><td>새 메뉴</td><td>JSON + <code>menu.ts</code> + 컴포넌트</td><td>BE·FE 모두</td></tr>
           </tbody>
         </table>
       </div>
       <div class="note">
         <p class="note-title">미확인</p>
-        <p>: FE 가 <code>titleKey</code> 를 어느 i18n 리소스에서 번역하는지는 이번에 확인하지 못했다. <code>name</code> 이 폴백인 것은 JSON 구조상 분명하다.</p>
+        <p>FE 가 <code>titleKey</code> 를 어느 i18n 리소스에서 번역하는지는 이번에 찾지 못했다. <code>name</code> 이 폴백이라는 것은 JSON 구조로 보아 분명하다.</p>
       </div>
     </section>
     <section id="s8">
       <h2><span class="num">08</span><span>권한 설계 규칙 (실무)</span></h2>
-      <p class="lede">실무에서 쓰는 3줄 규칙과 /my 패턴, 역할 × 범위 × 행위 사례.</p>
+      <p class="lede">3줄 규칙과 /my 패턴, 그리고 역할로는 표현할 수 없는 삭제 권한.</p>
       <h3>3줄 규칙</h3>
       <div class="code">
         <div class="code-head">도식</div>
@@ -475,10 +461,10 @@ menu.ts 의              path: '/agent/dashboard'  (+ icon, lazy)</pre>
                  [드물다. 현재 전체 11곳]
 
 3. 파괴적 행위 → hasFeature('도메인:자원:행위:범위') 로 개별 명시
-                 [삭제·승인·적용. 요구사항이 갈리는 지점은 거의 항상 여기다]</pre>
+                 [삭제·승인·적용. 요구사항이 갈리는 지점은 거의 언제나 여기다]</pre>
       </div>
       <h3><code>/my</code> 패턴</h3>
-      <p><strong>언제 쓰나</strong>: "내가 만든 것 / 나에게 배정된 것" 을 조회할 때.</p>
+      <p>"내가 만든 것, 나에게 배정된 것"을 조회할 때 쓴다.</p>
       <div class="code">
         <div class="code-head">JAVA</div>
 <pre>@GetMapping("/my")
@@ -494,8 +480,7 @@ public Page&lt;EvaluationResultDTO&gt; getMine(Pageable pageable) {
             .build(), pageable);
 }</pre>
       </div>
-      <h3>3원칙</h3>
-      <ol><li><strong>권한을 낮추는 게 아니라 범위를 좁힌다</strong> — <code>isAuthenticated()</code> 만 요구하되 범위를 서버가 못박음</li><li><strong>신원을 클라이언트가 못 정한다</strong> — <code>consultantId</code> 파라미터를 <strong>아예 받지 않는다</strong></li><li><strong>매핑이 없으면 빈 결과</strong> — 예외가 아니라 <code>Page.empty()</code></li></ol>
+      <p>이 패턴은 권한을 낮추는 것이 아니라 범위를 좁히는 것이다. 요구하는 건 로그인뿐이지만 범위는 서버가 못박는다. 신원은 클라이언트가 정하지 못한다. <code>consultantId</code> 파라미터를 받지 않는다는 것이 그 뜻이다. 매핑이 없으면 예외가 아니라 빈 페이지를 돌려준다.</p>
       <h3>현재 존재하는 <code>/my</code> 전수 (11개, 2026-10-12)</h3>
       <div class="table-wrap">
         <table>
@@ -510,15 +495,9 @@ public Page&lt;EvaluationResultDTO&gt; getMine(Pageable pageable) {
           </tbody>
         </table>
       </div>
-      <div class="note">
-        <p>7월엔 14개였는데 kms 의 3개(<code>/my-requests</code> 등)가 빠져 11개다. 61개 모듈 중 6개 모듈에만 있다. 패턴이 "내가 만든 것 / 나에게 배정된 것" 둘뿐이라 많아질 수 없는 구조다.</p>
-      </div>
-      <div class="note">
-        <p><code>/my-menus</code> 자체가 <code>isAuthenticated()</code> 인 이유 — 로그인만 하면 누구나 호출 가능해야 사이드바를 그릴 수 있기 때문이다.</p>
-      </div>
+      <p>7월에는 14개였는데 kms 의 셋이 빠져 11개가 됐다. 61개 모듈 중 여섯에만 있다. 패턴이 "내가 만든 것"과 "나에게 배정된 것" 둘뿐이라 많아질 수가 없다. <code>/my-menus</code> 가 <code>isAuthenticated()</code> 인 것도 같은 이유다. 로그인만 하면 누구나 사이드바를 그려야 한다.</p>
       <h3>Case 1 — 관리자 메뉴 + 본인 대시보드</h3>
-      <p><strong>요구</strong>: 평가결과 관리 메뉴는 관리자만. 단 일반 사용자도 대시보드에서 본인 평가결과는 봐야 함.</p>
-      <p><strong>해법</strong>: 엔드포인트 2개로 분리. 둘 다 컨트롤러는 <code>isAuthenticated()</code> 다.</p>
+      <p>요구는 이렇다. 평가결과 관리 메뉴는 관리자만 쓰되, 일반 사용자도 대시보드에서 자기 평가결과는 봐야 한다. 엔드포인트를 둘로 나눈다. 둘 다 컨트롤러는 <code>isAuthenticated()</code> 다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>용도</th><th>엔드포인트</th><th><code>@PreAuthorize</code></th><th>범위</th></tr></thead>
@@ -528,27 +507,24 @@ public Page&lt;EvaluationResultDTO&gt; getMine(Pageable pageable) {
           </tbody>
         </table>
       </div>
-      <p>7월엔 관리 쪽이 <code>hasRole('ADMIN') or hasMenuPermission('MENU_EVALUATION_RESULTS')</code> 였다. 지금은 <strong>메뉴 권한을 컨트롤러에서 검사하지 않고</strong> 매트릭스가 사이드바 노출로 통제한다. 일반 사용자에게 관리 메뉴 권한을 주면 사이드바에 관리 메뉴가 뜨므로, <code>/my</code> 분리가 맞다는 결론은 같다.</p>
+      <p>7월에는 관리 쪽이 <code>hasRole('ADMIN') or hasMenuPermission('MENU_EVALUATION_RESULTS')</code> 였다. 지금은 컨트롤러가 메뉴 권한을 보지 않고 매트릭스가 사이드바 노출로 통제한다. 일반 사용자에게 관리 메뉴 권한을 주면 사이드바에 관리 메뉴가 떠 버리니까 <code>/my</code> 로 나누는 게 맞다는 결론은 그대로다.</p>
       <h3>Case 2 — 3단계 역할 × 범위 × 행위</h3>
-      <h3>요구</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th></th><th>열람</th><th>수정</th><th>삭제</th></tr></thead>
           <tbody>
             <tr><td>관리자</td><td>전체</td><td>전체</td><td>전체</td></tr>
-            <tr><td>중간관리자</td><td>전체</td><td>전체</td><td><strong>불가</strong></td></tr>
+            <tr><td>중간관리자</td><td>전체</td><td>전체</td><td>불가</td></tr>
             <tr><td>일반사용자</td><td>본인만</td><td>본인만</td><td>본인만</td></tr>
           </tbody>
         </table>
       </div>
-      <h3>흔한 실수</h3>
       <div class="code">
         <div class="code-head">JAVA</div>
 <pre><span class="c-bad">@PreAuthorize("hasRole('ADMIN')")              // ✗ 일반사용자가 본인 것을 못 지움 + CRITICAL 19 위반</span>
 <span class="c-bad">@PreAuthorize("hasAnyRole('ADMIN','USER')")    // ✗ 일반사용자에게 전체 삭제가 열림</span></pre>
       </div>
-      <p>삭제 가능 여부가 <strong>역할이 아니라 "권한 + 소유 여부의 조합"</strong> 이라 역할만으로는 표현이 안 된다.</p>
-      <h3>해법 — 게이트는 느슨하게, 판정은 서비스에서</h3>
+      <p>삭제할 수 있는지는 역할이 아니라 "권한과 소유의 조합"이 정한다. 역할 하나로는 표현이 안 된다. 그래서 게이트는 느슨하게 두고 판정은 서비스에서 한다.</p>
       <div class="code">
         <div class="code-head">JAVA</div>
 <pre><span class="c-dim">// 1. 컨트롤러 — 클래스 레벨은 로그인만</span>
@@ -590,38 +566,37 @@ public void delete(@PathVariable Long id) {
     historyService.delete(id);
 }</pre>
       </div>
-      <p><strong>권한 코드에 범위를 인코딩</strong>하면 <code>ADMIN</code>/<code>SUPERVISOR</code> 같은 역할명이 코드에서 사라진다. → 요구사항 변경 시 <strong>DB 만 수정</strong>하면 된다. 이것이 CRITICAL 27 의 "같은 범위 · 관리자 단축 없음"이다 — 관리자라고 검사를 건너뛰는 분기를 두지 않는다.</p>
-      <h3>절대 규칙 3가지</h3>
-      <ol><li><strong>신원은 언제나 토큰에서</strong> — <code>SecurityUtils.getCurrentUserIdOrThrow()</code>. 클라이언트가 보낸 <code>userId</code> 는 <strong>관리자 전용 엔드포인트에서만</strong> 신뢰한다. &gt; <code>?userId=123</code> 자체가 나쁜 게 아니다. <strong>일반 사용자도 호출 가능한데 그 값을 믿는 것</strong>이 나쁘다.</li></ol>
-      <ol><li><strong>범위 필터는 검증이 아니라 덮어쓴다</strong> — <code>criteria.setOwnerId(...)</code>. 검증은 빠뜨릴 수 있지만 덮어쓰기는 빠뜨리기 어렵다.</li></ol>
-      <ol><li><strong>목록과 단건의 실패 응답이 다르다</strong><ul><li>목록 → 빈 결과 (<code>Page.empty()</code>)</li><li>단건 → <strong>404</strong> (403 이 아님) &gt; 403 을 주면 "그 ID 는 존재한다"는 정보가 새어 나가 ID 스캔이 가능해진다. &gt; 실제 코드 주석: <em>"타인 결과 — 존재 여부 노출 방지 (404)"</em></li></ul></ol>
+      <p>범위를 권한 코드에 넣으면 역할 이름이 코드에서 사라지고, 요구사항이 바뀔 때 DB 만 고치면 된다. CRITICAL 27 의 "같은 범위 · 관리자 단축 없음"이 이 코드의 다른 이름이다. 관리자라고 검사를 건너뛰는 분기를 두지 않는다.</p>
+      <h3>절대 규칙 셋</h3>
+      <p>신원은 언제나 토큰에서 꺼낸다. <code>SecurityUtils.getCurrentUserIdOrThrow()</code>. 클라이언트가 보낸 <code>userId</code> 는 관리자 전용 엔드포인트에서만 믿는다. <code>?userId=123</code> 자체가 나쁜 게 아니라, 일반 사용자도 부를 수 있는 곳에서 그 값을 믿는 것이 나쁘다.</p>
+      <p>범위 필터는 검증하지 않고 덮어쓴다. <code>criteria.setOwnerId(...)</code>. 검증은 어딘가에서 빠뜨리게 되어 있고 덮어쓰기는 빠뜨리기 어렵다.</p>
+      <p>목록과 단건의 실패 응답이 다르다. 목록은 빈 결과를, 단건은 403 이 아니라 404 를 준다. 403 을 주면 "그 ID 는 존재한다"는 사실이 새어 나가 ID 를 훑을 수 있게 된다. 실제 코드 주석에도 "타인 결과 — 존재 여부 노출 방지 (404)"라고 적혀 있다.</p>
       <h3>SSOT 유지</h3>
-      <p>범위 판정 로직은 <strong>단일 유틸로 두고 모든 엔드포인트가 그것을 통하게</strong> 한다. 엔드포인트마다 따로 판정하면 반드시 어딘가 빠진다.</p>
-      <p>실제 사례: <code>evaluation/util/MyEvaluationScope.owns(identity, result)</code> — <code>/my</code> 계열이 전부 이것을 쓴다(호출부 4곳).</p>
+      <p>범위 판정은 유틸 하나에 두고 모든 엔드포인트가 그것을 지나가게 한다. 엔드포인트마다 따로 판정하면 반드시 한 곳이 빠진다. <code>evaluation/util/MyEvaluationScope.owns(identity, result)</code> 가 그 예인데, <code>/my</code> 계열 네 곳이 전부 이 메서드를 부른다.</p>
     </section>
     <section id="s9">
       <h2><span class="num">09</span><span>함정 모음</span></h2>
-      <p class="lede">조용히 실패하는 지점 9가지.</p>
+      <p class="lede">에러 없이 실패하는 자리 아홉.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>#</th><th>함정</th><th>대응</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td class="wrap"><strong>권한 캐시</strong> — DB 를 직접 UPDATE 하면 반영 안 됨</td><td class="wrap"><code>userPermissions</code>/<code>userMenus</code> 캐시(44·78줄). <strong>권한 관리 화면을 통해</strong> 변경(172·181줄 <code>@CacheEvict</code>)하거나 재로그인</td></tr>
-            <tr><td>2</td><td class="wrap"><strong>path 불일치</strong> (<code>menu-definition.json</code> ↔ <code>menu.ts</code>)</td><td class="wrap">조용히 실패. 메뉴가 안 보이거나 <code>unresolved</code>. 신규 메뉴 사고의 대부분</td></tr>
-            <tr><td>3</td><td class="wrap"><strong><code>@EnableMethodSecurity(prePostEnabled=true)</code> 누락</strong></td><td class="wrap"><code>@PreAuthorize</code> 가 <strong>에러 없이 무시</strong>됨 (보안 설정 3개 + <code>PermissionSecurityConfig</code> 에 있음)</td></tr>
-            <tr><td>4</td><td><strong><code>dynamic_roles</code> 시드 누락</strong></td><td class="wrap">새 DB 구축 시 id=1/2/3 필요. <code>aws-deploy/README.md</code> 가 가리키는 <code>seed_dynamic_roles.sql</code> 은 <strong>저장소에 없다</strong> — 빈 DB 로 Flyway 전수 적용을 먼저 검증할 것</td></tr>
-            <tr><td>5</td><td><strong>매트릭스 규칙 순서</strong></td><td>넓은 규칙을 위에 두면 아래 규칙이 죽는다</td></tr>
-            <tr><td>6</td><td><strong>낡은 주석</strong></td><td class="wrap"><code>LocalSecurityConfig</code> 41줄 주석("JWT 인증 없이")은 사실이 아니다</td></tr>
-            <tr><td>7</td><td><strong>FE 기능 권한 갱신 시점</strong></td><td class="wrap">로그인 시 <code>permissionService.me()</code> 로 <code>permissions</code> 를 채운다(<code>stores/auth.ts</code> 44줄) → <strong>세션 중 권한 변경은 재로그인 필요</strong></td></tr>
-            <tr><td>8</td><td><strong>메뉴 변경 후 BE 재시작</strong></td><td class="wrap"><code>menu-definition.json</code> → <code>menus</code> 테이블 동기화가 기동 시 수행됨</td></tr>
-            <tr><td>9</td><td><strong><code>hasRole</code> 신규 추가</strong></td><td class="wrap">리뷰·CI 에서 차단된다(CRITICAL 19). <code>hasFeature</code> 로 쓴다</td></tr>
+            <tr><td>1</td><td class="wrap">권한 캐시 — DB 를 직접 UPDATE 하면 반영 안 됨</td><td class="wrap"><code>userPermissions</code>/<code>userMenus</code> 캐시(44·78줄). 권한 관리 화면을 통해 변경(172·181줄 <code>@CacheEvict</code>)하거나 재로그인</td></tr>
+            <tr><td>2</td><td class="wrap">path 불일치 (<code>menu-definition.json</code> ↔ <code>menu.ts</code>)</td><td class="wrap">조용히 실패. 메뉴가 안 보이거나 <code>unresolved</code>. 신규 메뉴 사고의 대부분</td></tr>
+            <tr><td>3</td><td class="wrap"><code>@EnableMethodSecurity(prePostEnabled=true)</code> 누락</td><td class="wrap"><code>@PreAuthorize</code> 가 에러 없이 무시됨 (보안 설정 3개 + <code>PermissionSecurityConfig</code> 에 있음)</td></tr>
+            <tr><td>4</td><td><code>dynamic_roles</code> 시드 누락</td><td class="wrap">새 DB 구축 시 id=1/2/3 필요. <code>aws-deploy/README.md</code> 가 가리키는 <code>seed_dynamic_roles.sql</code> 은 저장소에 없다 — 빈 DB 로 Flyway 전수 적용을 먼저 검증할 것</td></tr>
+            <tr><td>5</td><td>매트릭스 규칙 순서</td><td>넓은 규칙을 위에 두면 아래 규칙이 죽는다</td></tr>
+            <tr><td>6</td><td>낡은 주석</td><td class="wrap"><code>LocalSecurityConfig</code> 41줄 주석("JWT 인증 없이")은 사실이 아니다</td></tr>
+            <tr><td>7</td><td>FE 기능 권한 갱신 시점</td><td class="wrap">로그인 시 <code>permissionService.me()</code> 로 <code>permissions</code> 를 채운다(<code>stores/auth.ts</code> 44줄) → 세션 중 권한 변경은 재로그인 필요</td></tr>
+            <tr><td>8</td><td>메뉴 변경 후 BE 재시작</td><td class="wrap"><code>menu-definition.json</code> → <code>menus</code> 테이블 동기화가 기동 시 수행됨</td></tr>
+            <tr><td>9</td><td><code>hasRole</code> 신규 추가</td><td class="wrap">리뷰·CI 에서 차단된다(CRITICAL 19). <code>hasFeature</code> 로 쓴다</td></tr>
           </tbody>
         </table>
       </div>
     </section>
     <section id="s10">
       <h2><span class="num">10</span><span>자가진단</span></h2>
-      <p class="lede">10문항. 다 답하면 0단계 끝.</p>
+      <p class="lede">열 문항.</p>
       <ol><li>401 과 403 은 각각 무엇이 문제인가?</li><li><code>JwtAuthenticationFilter</code> 는 왜 토큰이 틀려도 요청을 통과시키는가?</li><li><code>/api/stt/message</code> 가 <code>permitAll</code> 인데 왜 안전한가?</li><li><code>hasFeature('x:y:delete:all')</code> 은 매 요청 DB 를 조회하는가? 권한을 DB 에서 바꾸면 언제 반영되나?</li><li>일반 사용자가 본인 평가결과를 보게 하려면 메뉴 권한을 줘야 하는가?</li><li><code>?userId=123</code> 파라미터는 언제 안전하고 언제 위험한가?</li><li>단건 조회에서 타인 데이터일 때 403 이 아니라 404 를 주는 이유는?</li><li>고객이 "중간관리자에게 삭제 권한 주세요" 라고 하면 배포가 필요한가?</li><li>메뉴 이름만 바꾸려면 어디를 고치고, 무엇을 재기동하나?</li><li><code>menu.ts</code> 를 완전히 없애지 못하는 근본 이유는?</li></ol>
     </section>
     <section id="s11">
@@ -643,7 +618,7 @@ public void delete(@PathVariable Long id) {
             <tr><td>메뉴 권한 자동 생성</td><td class="wrap"><code>permission/service/impl/DynamicRoleServiceImpl.java</code> (<code>PERM_…_ACCESS</code>)</td></tr>
             <tr><td>내 메뉴 API</td><td class="wrap"><code>permission/controller/UserMenuController.java</code> (<code>/my-menus</code> 52줄)</td></tr>
             <tr><td>신원 유틸</td><td class="wrap"><code>core/util/SecurityUtils.java</code></td></tr>
-            <tr><td><strong>메뉴 SSOT</strong></td><td class="wrap"><code>src/main/resources/menu/menu-definition.json</code> (2,422줄)</td></tr>
+            <tr><td>메뉴 SSOT</td><td class="wrap"><code>src/main/resources/menu/menu-definition.json</code> (2,422줄)</td></tr>
             <tr><td>React 메뉴 레지스트리</td><td class="wrap"><code>web-react/src/config/menu.ts</code> (1,595줄)</td></tr>
             <tr><td>React 메뉴 수신·병합</td><td class="wrap"><code>web-react/src/hooks/use-my-menus.ts</code> · <code>web-react/src/lib/menu-merge.ts</code></td></tr>
             <tr><td>React 기능 권한 훅</td><td class="wrap"><code>web-react/src/lib/use-permission.ts</code></td></tr>
@@ -659,12 +634,12 @@ public void delete(@PathVariable Long id) {
     <div class="closing">
       <h2><span class="num">■</span><span>기억할 것</span></h2>
       <ol>
-        <li><strong>필터는 채우고, 매트릭스가 막는다.</strong> 401 이면 토큰 문제, 403 이면 권한 문제.</li>
-        <li><strong>API 인가는 인증 여부로만.</strong> hasRole 은 1건만 남았다. 파괴적 행위는 hasFeature, 범위는 서비스, 메뉴 노출은 매트릭스.</li>
-        <li><strong>순서가 곧 로직이다.</strong> 좁은 규칙이 위, 넓은 규칙이 아래. 뒤집으면 아래 규칙은 영원히 도달하지 못한다.</li>
-        <li><strong>@PreAuthorize 는 범위를 표현하지 못한다.</strong> &#x27;본인 것만&#x27;은 서비스 코드에서 신원을 토큰으로부터 뽑아 덮어쓴다.</li>
-        <li><strong>path 가 BE 메뉴와 FE 레지스트리를 잇는 접착제다.</strong> menu-definition.json 과 menu.ts 의 path 가 어긋나면 에러 없이 메뉴가 사라진다.</li>
-        <li><strong>단건은 403 이 아니라 404.</strong> 존재 여부를 흘리지 않는다.</li>
+        <li><strong>필터는 적고, 매트릭스가 막는다.</strong> 401 이면 토큰 문제, 403 이면 권한 문제다.</li>
+        <li><strong>API 인가는 인증 여부로만 한다.</strong> hasRole 은 한 건 남았다. 되돌리기 어려운 행위는 hasFeature, 범위는 서비스, 메뉴 노출은 매트릭스.</li>
+        <li><strong>순서가 곧 로직이다.</strong> 좁은 규칙이 위, 넓은 규칙이 아래. 뒤집으면 아래 규칙은 영원히 차례가 오지 않는다.</li>
+        <li><strong>@PreAuthorize 는 범위를 말할 줄 모른다.</strong> &#x27;자기 것만&#x27;은 서비스 코드가 토큰에서 신원을 꺼내 덮어쓴다.</li>
+        <li><strong>path 가 접착제다.</strong> menu-definition.json 과 menu.ts 의 path 가 어긋나면 에러 없이 메뉴가 사라진다.</li>
+        <li><strong>단건은 403 이 아니라 404 다.</strong> 존재 여부를 흘리지 않는다.</li>
       </ol>
     </div>
 

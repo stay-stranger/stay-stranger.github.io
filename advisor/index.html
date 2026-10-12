@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="모듈 57개짜리 Spring Boot + React 저장소를 모듈 단위로 읽어 나가는 학습 기록의 목차. 7단계 학습 경로와 각 단계의 글.">
+<meta name="description" content="모듈 61개짜리 Spring Boot + React 저장소를 모듈 하나씩 읽어 나가는 기록의 목차. 7단계 학습 경로와 지금까지 남긴 글.">
 <title>어드바이저 코드 읽기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,10 +30,10 @@
     <p class="eyebrow">코드베이스 학습 · 시리즈 목차</p>
     <h1>어드바이저 코드 읽기</h1>
     <p class="standfirst">
-      Java 파일 7,814개, 백엔드 모듈 61개, React 컴포넌트 1,642개짜리 저장소를
-      처음부터 끝까지 이해하는 건 불가능하다. 그래서 목표를 바꿨다.
-      <strong>필요한 부분에 빠르게 도달하는 능력</strong>을 기르는 순서로 모듈을 하나씩 읽고,
-      읽은 만큼 글로 남긴다. 이 페이지가 그 목차다.
+      저장소를 받아 파일 수를 세어 본 날, 전부 이해하겠다는 계획을 접었다.
+      Java 파일 7,814개와 모듈 61개 앞에서 지도를 외우는 사람은 없다.
+      대신 <strong>자주 다니는 길부터 발에 익히기로</strong> 했고, 모듈을 하나 읽을 때마다
+      글 하나를 남기기로 했다. 이 페이지는 그 길의 순서이자 지금까지 남긴 글의 목록이다.
     </p>
 
     <div class="meta-strip">
@@ -47,23 +47,24 @@
       <p class="lede">위에서부터 순서대로. 건너뛰면 뒤에서 막힌다.</p>
 
       <p>
-        각 글은 모듈 하나를 같은 틀로 다룬다. 이 모듈이 하는 일 한 문장, 읽을 파일과 줄 범위,
-        실제 DB 데이터를 보는 쿼리, 메서드 하나를 끝까지 따라가는 추적, 함정 모음, 자가진단 순이다.
-        글 끝의 자가진단을 통과하면 다음 글로 넘어간다.
+        글마다 틀이 같다. 이 모듈이 하는 일을 한 문장으로 적고, 읽을 파일과 줄 범위를 정하고,
+        실제 DB 행을 보는 쿼리를 돌린 다음, 메서드 하나를 끝까지 따라간다. 그 뒤에 함정을 모아 두고
+        자가진단으로 닫는다. 자가진단을 넘지 못했으면 다음 글로 가지 않는다. 뒤의 글이 앞의 글을
+        딛고 서 있기 때문이다.
       </p>
 
       <div class="note is-key">
         <p class="note-title">이 시리즈의 전제</p>
         <p>
-          0~2단계가 전체 Java 파일의 약 9%(671 / 7,814)인데, 실무의 대부분이 이 9%에서 나온다.
-          나머지는 필요해질 때 모듈 지도를 보고 찾아가면 된다.
+          0~2단계가 전체 Java 파일의 9% 남짓(671 / 7,814)인데, 현업에서 손대는 일의 대부분이
+          그 안에서 일어난다. 나머지는 필요해질 때 모듈 지도를 꺼내 보면 된다.
         </p>
       </div>
     </section>
 
     <section id="s2">
       <h2><span class="num">02</span><span>학습 경로 7단계</span></h2>
-      <p class="lede">가장 크고 활발한 모듈에서 시작하면 반드시 지친다. 작은 것부터.</p>
+      <p class="lede">큰 모듈은 패턴을 보여 주기 전에 사람을 먼저 지치게 한다. 작은 것부터.</p>
 
       <div class="table-wrap">
         <table>
@@ -79,11 +80,11 @@
           </tbody>
         </table>
       </div>
-      <p class="cap">파일 수는 2026-10-12 커밋 기준 Java 파일 실측. 7월 초판 대비 전체가 약 1.3배 늘어서 모든 단계 수치를 다시 쟀다.</p>
+      <p class="cap">파일 수는 2026-10-12 커밋 기준 Java 파일 실측. 7월 초판 뒤로 전체가 1.3배쯤 불어나서 모든 단계를 다시 쟀다.</p>
 
       <div class="note is-warn">
         <p class="note-title">6단계는 마지막까지 미룬다</p>
-        <p>가장 어렵고 가장 자주 바뀐다. 필요해지기 전에는 손대지 않는다.</p>
+        <p>가장 어렵고 가장 자주 바뀌는 자리다. 필요해지기 전에는 손대지 않는다.</p>
       </div>
     </section>
 
@@ -97,12 +98,12 @@
         <div class="order-row is-win"><span class="order-idx">3</span><span class="order-name"><a href="/advisor/stt-module.html">stt 모듈 — 모듈 구조 패턴 체득</a> <span class="order-tag">1단계</span></span></div>
         <div class="order-row is-lose"><span class="order-idx">4</span><span class="order-name">evaluation 모듈 — 핵심 업무 도메인 (예정)</span></div>
       </div>
-      <p class="cap">1번 글이 전체 경로와 0단계 세 모듈을 다루고, 2번이 그중 권한 체계를 깊게 판다. 3번부터 모듈 하나에 글 하나다.</p>
+      <p class="cap">1번 글이 전체 경로와 0단계 세 모듈을 다루고, 2번이 그중 권한 체계를 깊게 판다. 3번부터는 모듈 하나에 글 하나씩이다.</p>
     </section>
 
     <section id="s4">
       <h2><span class="num">04</span><span>공통 루틴</span></h2>
-      <p class="lede">모듈이 57개지만 전부 같은 구조라, 접근법도 하나면 된다.</p>
+      <p class="lede">모듈이 61개지만 생김새가 같아서, 여는 손은 하나면 된다.</p>
 
       <div class="code">
         <div class="code-head">모듈 하나를 읽는 5단계</div>
@@ -129,7 +130,7 @@
 
       <div class="note">
         <p class="note-title">3번을 건너뛰지 않는다</p>
-        <p>실제 데이터를 보면 코드가 갑자기 읽힌다. 코드만 보면 추상적이라 머리에 남지 않는다.</p>
+        <p>세 번째 단계를 건너뛰고 싶은 유혹이 매번 온다. 순서를 바꿔 보면 안다. 실제 행 열 개를 눈으로 본 뒤에 엔티티를 다시 열면, 조금 전까지 추상적이던 컬럼 이름이 전부 아는 얼굴이 되어 있다.</p>
       </div>
     </section>
 
@@ -138,10 +139,10 @@
     <div class="closing">
       <h2><span class="num">■</span><span>기억할 것</span></h2>
       <ol>
-        <li><strong>전부 이해하는 건 목표가 아니다.</strong> 필요한 부분에 빠르게 도달하는 능력이 목표다.</li>
-        <li><strong>작은 모듈부터.</strong> 큰 모듈에서 시작하면 패턴이 아니라 피로만 남는다.</li>
-        <li><strong>DB 를 먼저 본다.</strong> 명사(entity) → 실데이터 → 동사(controller) → 추적(service).</li>
-        <li><strong>글마다 자가진단이 있다.</strong> 통과하지 못했으면 다음 글로 넘어가지 않는다.</li>
+        <li><strong>전부 이해하는 건 목표가 아니다.</strong> 필요한 자리에 빠르게 도달하는 능력이 목표다.</li>
+        <li><strong>작은 모듈부터.</strong> 큰 모듈에서 시작하면 패턴 대신 피로가 남는다.</li>
+        <li><strong>DB 를 먼저 본다.</strong> 명사(entity), 실데이터, 동사(controller), 추적(service)의 순서다.</li>
+        <li><strong>글마다 자가진단이 있다.</strong> 넘지 못했으면 다음 글로 가지 않는다.</li>
       </ol>
     </div>
 

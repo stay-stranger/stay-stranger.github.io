@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Java 파일 7,814개·모듈 61개짜리 저장소를 처음 받아 든 개발자를 위한 읽기 순서. 전체의 9%에서 시작해 실무의 대부분에 먼저 도달한다.">
+<meta name="description" content="Java 파일 7,814개, 모듈 61개짜리 저장소를 처음 받아 든 사람을 위한 읽기 순서. 전체의 9%에서 시작해 자주 다니는 길부터 발에 익힌다.">
 <title>어드바이저 코드베이스 학습 가이드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
       <li><a href="#s3">[0단계] core — 기반</a></li>
       <li><a href="#s4">[0단계] auth — 로그인</a></li>
       <li><a href="#s5">[0단계] permission — 권한</a></li>
-      <li><a href="#s6">[1단계] stt — 패턴 체득 실질적 시작점</a></li>
+      <li><a href="#s6">[1단계] stt — 패턴 체득, 실질적 시작점</a></li>
       <li><a href="#s7">[2단계] evaluation — 핵심 업무 도메인</a></li>
       <li><a href="#s8">[3~6단계] 개요</a></li>
       <li><a href="#s9">자주 쓰는 명령어</a></li>
@@ -38,7 +38,7 @@
     <p class="eyebrow">코드베이스 학습 · 길잡이</p>
     <h1>어드바이저 코드베이스 학습 가이드</h1>
     <p class="standfirst">
-      Java 파일 7,814개, 모듈 61개짜리 저장소를 처음 받아 든 개발자를 위한 순서다. 전부 이해하려 들면 반드시 지친다. 전체의 <strong>약 9%</strong>인 여섯 모듈에서 시작해 실무의 <strong>대부분</strong>에 먼저 도달하고, 나머지는 지도를 보고 찾아가는 방식으로 읽는다.
+      저장소를 받아 파일 수를 세어 본 날, 전부 이해하겠다는 계획을 접었다. Java 파일 7,814개와 모듈 61개 앞에서 지도를 외우는 사람은 없다. 대신 자주 다니는 길 몇 개를 먼저 발에 익히고 나머지는 지도를 꺼내 보기로 했다. 이 글은 그 길의 순서다. 전체의 <strong>9%</strong>에서 시작한다.
     </p>
 
     <div class="meta-strip">
@@ -48,14 +48,14 @@
     </div>
 
       <div class="note">
-        <p class="note-title">2026-10-12 갱신 요지.</p>
-        <p>두 달 반 사이 Java 파일이 5,810 → 7,814개로 늘었다. 읽는 순서와 루틴은 그대로지만 수치·줄 번호는 전부 다시 쟀고, 권한 체계(역할 → 기능 권한 이관)와 메뉴 체계(BE JSON 이 SSOT)가 바뀌어 02 권한 가이드를 함께 고쳤다. 1단계 stt 는 별도 문서(03)로 분리했다.</p>
+        <p class="note-title">갱신 요지</p>
+        <p>7월에 쓴 초판은 두 달 반 만에 낡았다. Java 파일이 5,810개에서 7,814개로 늘었고, 권한은 역할에서 기능 권한으로 옮겨 갔고, 메뉴의 원본은 프런트에서 백엔드 JSON 으로 넘어갔다. 읽는 순서는 그대로 두고 숫자와 줄 번호는 전부 다시 쟀다. 1단계 stt 는 글 하나로 따로 떼어 냈다.</p>
       </div>
 
     <section id="s0">
       <h2><span class="num">00</span><span>시작하기 전에</span></h2>
-      <p class="lede">규모를 숫자로 보고, 목표를 '전부 이해'에서 '빠르게 도달'로 바꾼다.</p>
-      <h3>규모 (실측, 2026-10-12)</h3>
+      <p class="lede">숫자를 먼저 보고, 목표를 바꾼다.</p>
+      <p>저장소를 받아 <code>find</code> 로 Java 파일을 세어 봤을 때 숫자는 7,814였다. 최상위 패키지만 61개. Flyway 마이그레이션 파일은 1,127개가 쌓여 있었고, React 쪽은 tsx 파일이 1,642개였다. 그 숫자를 보고 나는 "전부 이해하겠다"는 계획을 접었다. 접는 데 오래 걸리지 않았다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>항목</th><th>수량</th><th>7월 대비</th></tr></thead>
@@ -68,46 +68,44 @@
           </tbody>
         </table>
       </div>
-      <h3>마음가짐</h3>
-      <h3>전부 파악하는 건 불가능하다. 목표를 바꿔야 한다.</h3>
-      <ul><li>✗ 목표: 전체 코드 이해</li><li>✓ 목표: <strong>필요한 부분에 빠르게 도달하는 능력</strong></li></ul>
-      <p>이 가이드의 0~2단계가 전체 Java 파일의 <strong>약 9%</strong> (671 / 7,814)다. 그런데 실무의 <strong>대부분</strong>이 이 9%에서 나온다. 나머지는 필요해질 때 지도(<code>PROJECT_INDEX.md</code>)를 보고 찾아가면 된다.</p>
+      <p>목표는 다른 것이어야 했다. 이 저장소에서 필요한 자리에 빠르게 도달하는 능력. 지도를 전부 외우는 사람은 없다. 자주 다니는 길 몇 개를 발에 익히고, 나머지는 지도를 꺼내 본다. 이 가이드의 0~2단계가 전체 Java 파일의 9% 남짓인데(671 / 7,814), 현업에서 손대는 일의 대부분이 그 안에서 일어난다.</p>
       <h3>항상 옆에 둘 문서 4개</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>파일</th><th>용도</th></tr></thead>
           <tbody>
-            <tr><td class="scope-name"><code>PROJECT_INDEX.md</code></td><td class="wrap"><strong>61개 모듈 한 줄 지도.</strong> 길 잃으면 여기부터</td></tr>
+            <tr><td class="scope-name"><code>PROJECT_INDEX.md</code></td><td class="wrap">61개 모듈의 한 줄 지도. 길을 잃으면 여기부터</td></tr>
             <tr><td class="wrap"><code>AGENTS.md</code> (<code>CLAUDE.md</code> 가 이 파일을 가져온다)</td><td>규칙·CRITICAL 인덱스·명령어</td></tr>
             <tr><td class="scope-name wrap"><code>claudedocs/MODULE_ARCHITECTURE.md</code></td><td>모듈별 상세 구조 (2026-05 아카이브)</td></tr>
-            <tr><td class="scope-name wrap"><code>claudedocs/08_backend_services/CODE_REVIEW_CHECKLIST.md</code></td><td>지뢰 목록 (코드 쓰기 전 필독)</td></tr>
+            <tr><td class="scope-name wrap"><code>claudedocs/08_backend_services/CODE_REVIEW_CHECKLIST.md</code></td><td>지뢰 목록. 코드를 쓰기 전에 읽는다</td></tr>
           </tbody>
         </table>
       </div>
     </section>
     <section id="s1">
       <h2><span class="num">01</span><span>전체 학습 경로</span></h2>
-      <p class="lede">61개 모듈 중 어디서 시작해 어디로 갈지. 7단계 순서와 그 이유.</p>
-      <p><code>ai</code>·<code>kms</code>·<code>agi</code>가 가장 크고 활발하지만 여기서 시작하면 반드시 지친다.</p>
+      <p class="lede">큰 모듈은 패턴을 보여 주기 전에 사람을 지치게 한다. 작은 것부터.</p>
+      <p>가장 크고 가장 바쁜 모듈은 <code>ai</code> 와 <code>kms</code> 와 <code>agi</code> 다. 그래서 거기서 시작하면 안 된다. 큰 모듈은 패턴을 보여 주기 전에 사람을 먼저 지치게 한다. 작은 모듈에서 구조를 익히고, 그 구조가 손에 붙은 뒤에 큰 쪽으로 건너간다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>단계</th><th>모듈</th><th>파일 수</th><th>목표</th><th>예상</th></tr></thead>
           <tbody>
             <tr><td><strong>0</strong></td><td class="wrap"><code>core</code> → <code>auth</code> → <code>permission</code></td><td>289 (137 + 82 + 70)</td><td>인증·권한·응답 규격</td><td>2~3일</td></tr>
-            <tr><td><strong>1</strong></td><td><code>stt</code> (+ <code>counseltype</code>)</td><td>65 (+35)</td><td><strong>모듈 구조 패턴 체득</strong> → 03 문서</td><td>1~2일</td></tr>
+            <tr><td><strong>1</strong></td><td><code>stt</code> (+ <code>counseltype</code>)</td><td>65 (+35)</td><td>모듈 구조 패턴 체득 → 별도 글</td><td>1~2일</td></tr>
             <tr><td><strong>2</strong></td><td><code>evaluation</code></td><td>282</td><td>핵심 업무 도메인</td><td>1주</td></tr>
             <tr><td><strong>3</strong></td><td class="wrap"><code>recording</code> → <code>sttanalytics</code></td><td>265 (112 + 153)</td><td>데이터 인입·분석</td><td>1주</td></tr>
             <tr><td><strong>4</strong></td><td><code>ai</code> (일부만)</td><td>1,227 중 3개 패키지</td><td>AI 실행 기반</td><td>3일</td></tr>
             <tr><td><strong>5</strong></td><td><code>rag</code> → <code>kms</code></td><td>1,048 (274 + 774)</td><td>검색·지식</td><td>2주</td></tr>
-            <tr><td><strong>6</strong></td><td><code>orchestration</code> → <code>agi</code></td><td>1,228 (515 + 713)</td><td>워크플로우·자율에이전트</td><td>필요 시</td></tr>
+            <tr><td><strong>6</strong></td><td><code>orchestration</code> → <code>agi</code></td><td>1,228 (515 + 713)</td><td>워크플로우·자율 에이전트</td><td>필요 시</td></tr>
             <tr><td>곁가지</td><td class="wrap"><code>chat</code> <code>assist</code> <code>agent</code> <code>compliance</code></td><td>353 / 286 / 182 / 420</td><td>필요할 때만</td><td>—</td></tr>
           </tbody>
         </table>
       </div>
       <div class="note">
-        <p>6단계는 <strong>가장 어렵고 가장 자주 바뀐다.</strong> 필요해지기 전엔 손대지 말 것.</p>
+        <p>6단계는 가장 어렵고 가장 자주 바뀐다. 필요해지기 전에는 손대지 않는다.</p>
       </div>
       <h3>모듈 규모·활동량 (참고)</h3>
+      <p>커밋 수는 최근 1년 동안 그 경로를 건드린 커밋만 센 것이다. 파일이 많다고 활발한 건 아니고, <code>core</code> 처럼 파일은 적어도 커밋이 몰리는 곳이 있다. 모두가 지나가는 길이라서 그렇다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>모듈</th><th>파일</th><th>최근 1년 커밋 수 (해당 경로)</th></tr></thead>
@@ -126,8 +124,8 @@
     </section>
     <section id="s2">
       <h2><span class="num">02</span><span>모듈 파헤치기 공통 루틴</span></h2>
-      <p class="lede">어떤 모듈이든 같은 5단계로 접근한다. 이 루틴이 이 가이드의 핵심 도구다.</p>
-      <p><strong>어떤 모듈이든 이 5단계로 접근한다.</strong> 61개 모듈이 전부 같은 구조다.</p>
+      <p class="lede">61개 모듈은 생김새가 같다. 하나를 여는 손이면 된다.</p>
+      <p>61개 모듈은 생김새가 같다. 하나를 여는 법만 익히면 나머지는 같은 손으로 열린다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>1) PROJECT_INDEX.md 에서 해당 모듈 한 줄 설명 확인
@@ -136,9 +134,9 @@
 4) controller/ — 밖에서 뭘 요청할 수 있는지 ("동사")
 5) service/impl/ — 관심 있는 메서드 하나만 끝까지 추적</pre>
       </div>
-      <p><strong>3번을 건너뛰지 마라.</strong> 실제 데이터를 보면 코드가 갑자기 읽힌다. 코드만 보면 추상적이라 머리에 남지 않는다.</p>
+      <p>세 번째 단계를 건너뛰고 싶은 유혹이 매번 온다. 코드를 읽고 있으면 데이터는 나중에 봐도 될 것 같다. 순서를 바꿔 보면 안다. 실제 행 열 개를 눈으로 본 뒤에 엔티티를 다시 열면, 조금 전까지 추상적이던 컬럼 이름이 전부 아는 얼굴이 되어 있다.</p>
       <h3>표준 디렉토리 구조</h3>
-      <p>모든 모듈이 아래 형태를 따른다. 하나를 익히면 나머지가 전부 보인다.</p>
+      <p>모든 모듈이 아래 형태를 따른다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>{module}/
@@ -155,14 +153,12 @@
     </section>
     <section id="s3">
       <h2><span class="num">03</span><span>[0단계] core — 기반</span></h2>
-      <p class="lede">응답 규격·보안 설정·JWT 필터. 137개 중 실제로 읽을 6개 파일.</p>
-      <p><strong>137개 중 실제로 볼 것은 6개 파일.</strong> 나머지는 필요할 때 찾으면 된다.</p>
+      <p class="lede">137개 파일 중 여섯. 명부를 적는 필터와 문을 지키는 매트릭스.</p>
+      <p>137개 파일 중 읽을 것은 여섯이다. 나머지는 길을 잃었을 때 찾아가면 된다.</p>
       <h3>3.1 <code>core/dto/ApiResponse.java</code> (269줄) — 가장 먼저</h3>
-      <p>모든 API 응답의 껍데기. <code>ApiResponse.success()</code> / <code>badRequest()</code> 형태가 <strong>전체 컨트롤러에서 반복</strong>된다. 이걸 알면 아무 컨트롤러나 열어도 응답부가 바로 읽힌다.</p>
-      <p>같이 볼 것: <code>core/dto/PageResponse.java</code> (126줄, 목록 조회 응답 규격)</p>
+      <p>모든 API 응답이 이 껍데기에 담겨 나간다. <code>ApiResponse.success()</code> 와 <code>badRequest()</code> 가 컨트롤러마다 반복되기 때문에, 이 파일 하나를 알고 나면 아무 컨트롤러나 열어도 응답부는 읽지 않고 지나갈 수 있다. 목록 응답의 규격인 <code>core/dto/PageResponse.java</code> (126줄)를 같이 본다.</p>
       <h3>3.2 <code>core/config/LocalSecurityConfig.java</code> (391줄)</h3>
-      <h3>"이 URL은 로그인 없이 되나?"의 답이 전부 여기 있다.</h3>
-      <p><strong>주의: 보안 설정이 프로파일별로 3개 파일로 나뉘어 있다.</strong></p>
+      <p>"이 URL 은 로그인 없이 되나"라는 질문의 답이 전부 여기 있다. 다만 파일이 셋이다. 프로파일마다 다른 문을 쓴다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>파일</th><th>줄 수</th><th>적용 프로파일 (<code>@Profile</code>)</th></tr></thead>
@@ -173,22 +169,20 @@
           </tbody>
         </table>
       </div>
-      <p><strong>본인이 쓰는 프로파일 것 하나만 본다.</strong> 셋 다 보면 헷갈린다.</p>
-      <p>집중해서 볼 부분:</p>
-      <ul><li><code>requestMatchers(...).permitAll()</code> — 인증 없이 열린 경로</li><li><code>.authenticated()</code> — 로그인만 요구하는 경로 (대부분이 이것이다)</li><li><code>.hasRole(...)</code> — 2026-10 기준 <strong>actuator 한 곳뿐</strong> (<code>/actuator/**</code> → ADMIN). API 인가에 role 을 박지 않는 것이 현재 규칙(CRITICAL 19)이다</li></ul>
+      <p>자기 프로파일 것 하나만 본다. 셋을 나란히 놓고 보면 어느 줄이 어느 환경 것인지 금방 섞인다. 볼 곳은 <code>permitAll()</code> 이 붙은 열린 경로, 로그인만 요구하는 <code>authenticated()</code>, 그리고 <code>hasRole(...)</code> 이다. 셋째는 2026-10 기준 <code>/actuator/**</code> 한 곳에만 남아 있다. API 경로에 역할을 박지 않는 것이 지금 규칙(CRITICAL 19)이다.</p>
       <h3>3.3 <code>core/security/JwtAuthenticationFilter.java</code> (343줄)</h3>
-      <p><strong>전체 코드베이스에서 가성비가 가장 높은 파일.</strong> 모든 요청이 여기를 통과한다. 7월엔 102줄이었는데 지금은 343줄이다. 늘어난 부분은 <strong>계정 회수(삭제·영구 정지) 판정</strong>과 <strong>ASYNC 디스패치에서의 SecurityContext 정리</strong>다. 핵심 흐름(아래)은 그대로다.</p>
-      <p>동작 요약:</p>
+      <p>처음 이 파일을 열었을 때 나는 요청을 막아 내는 코드를 찾고 있었다. 모든 요청이 지나가는 필터니까 당연히 어딘가에서 막을 거라고 생각했다. 막는 코드는 없었다. 토큰을 꺼내고, 맞는지 보고, 맞으면 <code>SecurityContext</code> 에 사람 이름을 적는다. 토큰이 없어도 틀려도 필터는 <code>filterChain.doFilter()</code> 를 부르고 길을 비켜 준다. 들여보낼지 말지는 뒤에 선 문, <code>SecurityConfig</code> 의 URL 매트릭스가 정한다.</p>
+      <p>7월에 102줄이던 파일이 지금은 343줄이다. 늘어난 부분은 계정이 삭제되거나 영구 정지된 경우를 토큰 만료와 구분해 처리하는 판정과, ASYNC 디스패치에서 <code>SecurityContext</code> 를 정리하는 코드다. 핵심 흐름은 그대로다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>① resolveToken(request) 으로 토큰 추출                       (322줄)
      1순위: Authorization: Bearer &lt;토큰&gt;
      2순위: ?token=&lt;토큰&gt; — 단, URL에 /stream 또는 /sse 포함 시에만 허용   (331~335줄)
-            (EventSource API가 커스텀 헤더를 못 보내기 때문)
+            (EventSource API 가 커스텀 헤더를 못 보내기 때문)
 
 ② tokenProvider.validateToken(token) 검증                     (129줄)
 
-③ 통과 시 userDetailsService.loadUserByUsername() 으로 DB에서 User 로드   (135줄)
+③ 통과 시 userDetailsService.loadUserByUsername() 으로 DB 에서 User 로드   (135줄)
      → SecurityContextHolder 에 인증 정보 저장
 
 ④ 사용자 로드 실패(삭제·영구 정지) 시 SecurityContext 를 비우고 미인증 처리
@@ -197,33 +191,31 @@
 ⑤ 토큰이 없거나 틀려도 여기서 막지 않는다 → filterChain.doFilter() 로 그냥 통과
    실제 차단은 SecurityConfig 의 경로 규칙이 담당</pre>
       </div>
-      <p><strong>⑤가 핵심 포인트다.</strong> 이 필터는 "인증 정보를 채워주는" 역할이지 "차단하는" 역할이 아니다. 401/403이 어디서 나는지 헷갈릴 때 이 구분을 기억할 것.</p>
+      <p>401 과 403 이 어디서 나오는지 헷갈릴 때마다 ⑤로 돌아오면 된다. 이 필터는 이름을 적는 쪽이고, 문은 다른 데 있다.</p>
       <h3>3.4 <code>core/security/JwtTokenProvider.java</code> (376줄)</h3>
-      <p>토큰 생성·검증·만료 처리. <strong>전체 정독 불필요.</strong> 3.3에서 궁금해진 메서드(<code>validateToken</code>, <code>getUsername</code>)만 골라서 본다.</p>
+      <p>토큰을 만들고 검증하고 만료시키는 곳이다. 전부 읽을 필요는 없다. 3.3 에서 궁금해진 <code>validateToken</code> 과 <code>getUsername</code> 만 골라 본다.</p>
       <h3>3.5 <code>core/exception/GlobalExceptionHandler.java</code> (1,990줄) — 훑기만</h3>
-      <p><strong>길다. 정독하지 말 것.</strong> 구조만 파악한다.</p>
-      <ul><li>예외가 어떻게 HTTP 응답으로 변환되는지의 규칙 모음</li><li><code>@ExceptionHandler</code> 가 붙은 메서드 목록만 스캔</li><li>알아두면 <strong>에러 메시지만 보고 원인 위치를 역추적</strong>할 수 있다</li></ul>
-      <p>같이 볼 것: <code>core/exception/BusinessException.java</code> (26줄, 업무 예외 기본형)</p>
+      <p>길다. 정독하면 하루가 간다. <code>@ExceptionHandler</code> 가 붙은 메서드 이름만 쭉 훑어서 어떤 예외가 어떤 HTTP 응답으로 바뀌는지 감만 잡는다. 이 감이 있으면 나중에 에러 메시지 한 줄로 원인 위치를 거슬러 올라갈 수 있다. 업무 예외의 기본형인 <code>core/exception/BusinessException.java</code> 는 26줄이라 금방 본다.</p>
       <h3>3.6 <code>core/config/DatabaseConfig.java</code> (516줄) — 훑기만</h3>
-      <p>MariaDB · PostgreSQL · MongoDB 멀티 DB 설정이라 길다. <strong>딱 하나만 기억한다:</strong></p>
+      <p>MariaDB 와 PostgreSQL 과 MongoDB 설정이 한 파일에 있어서 길다. 기억할 건 하나다.</p>
       <div class="note is-warn">
-        <p class="note-title">함정</p>
-        <p><strong>새 모듈 추가 시 <code>@EnableJpaRepositories(basePackages = …)</code> (27줄) + <code>setPackagesToScan(PRIMARY_ENTITY_PACKAGES)</code> (374줄) 에 등록 필수</strong> 안 하면 Repository 빈을 못 찾는다.</p>
+        <p class="note-title">새 모듈을 만들면 두 곳에 등록한다.</p>
+        <p><code>@EnableJpaRepositories(basePackages = …)</code> (27줄)와 <code>setPackagesToScan(PRIMARY_ENTITY_PACKAGES)</code> (374줄). 빠뜨리면 Repository 빈을 못 찾는다는 메시지가 기동 로그에 뜬다.</p>
       </div>
       <h3>0단계-core 자가진단</h3>
       <ol><li><code>/api/stt/message</code> 는 왜 인증 없이 호출되나? → 3.2</li><li>로그인 후 받은 토큰이 다음 요청에서 어떻게 검증되나? → 3.3</li><li>SSE 요청은 왜 쿼리파라미터로 토큰을 보내나? → 3.3</li><li>토큰이 틀렸을 때 실제로 요청을 막는 건 누구인가? → 3.3 ⑤ + 3.2</li><li>새 모듈을 만들었는데 Repository 빈을 못 찾으면? → 3.6</li></ol>
-      <h3>5개 다 답하면 통과. 핵심 부분만 보면 하루면 충분하다.</h3>
+      <p>다섯 개에 답할 수 있으면 넘어간다. 핵심 부분만 보면 하루면 된다.</p>
     </section>
     <section id="s4">
       <h2><span class="num">04</span><span>[0단계] auth — 로그인</span></h2>
-      <p class="lede">로그인 그 자체. core/security 와 역할이 어떻게 다른지.</p>
-      <p><code>core/security</code> 와 역할이 다르다. 혼동 주의.</p>
+      <p class="lede">첫 만남과 그 뒤의 매일. auth 와 core/security 가 사는 시간이 다르다.</p>
+      <p><code>auth</code> 와 <code>core/security</code> 는 자주 섞인다. 둘은 다른 시간을 산다. <code>auth</code> 는 로그인 그 순간의 일이다. 아이디와 비밀번호를 대조하고 토큰을 발급한다. <code>core/security</code> 는 그다음 모든 요청에서 발급된 토큰을 다시 확인한다. 첫 만남과 그 뒤의 매일.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th></th><th>역할</th></tr></thead>
           <tbody>
-            <tr><td class="scope-name"><code>auth</code></td><td class="wrap"><strong>로그인 그 자체</strong> — ID/PW 검증, 토큰 발급, SSO</td></tr>
-            <tr><td class="scope-name"><code>core/security</code></td><td><strong>발급된 토큰을 매 요청 검증</strong></td></tr>
+            <tr><td class="scope-name"><code>auth</code></td><td class="wrap">로그인 그 자체 — ID/PW 검증, 토큰 발급, SSO</td></tr>
+            <tr><td class="scope-name"><code>core/security</code></td><td>발급된 토큰을 매 요청 검증</td></tr>
           </tbody>
         </table>
       </div>
@@ -234,11 +226,11 @@
           <tbody>
             <tr><td class="scope-name wrap"><code>auth/controller/AuthController.java</code></td><td class="wrap"><code>/login</code>(110줄) · <code>/refresh</code>(433줄) · <code>/logout</code>(759줄)</td></tr>
             <tr><td class="scope-name"><code>auth/entity/User.java</code></td><td class="wrap">사용자 테이블. <code>accountNonLocked</code>(73줄) · <code>loginFailCount</code>(92줄)</td></tr>
-            <tr><td class="scope-name wrap"><code>auth/entity/LoginAuditLog.java</code></td><td>로그인 이력 (계정 잠금 추적)</td></tr>
+            <tr><td class="scope-name wrap"><code>auth/entity/LoginAuditLog.java</code></td><td>로그인 이력. 계정 잠금을 추적한다</td></tr>
           </tbody>
         </table>
       </div>
-      <p>나머지(<code>GoogleDesktopOAuthClient</code>, <code>UserGoogleConnection</code>, <code>PasswordResetApprovalToken</code>, <code>sso/</code>, <code>scheduler/</code>)는 <strong>해당 기능을 다룰 때만</strong> 본다.</p>
+      <p>구글 연동과 SSO 와 스케줄러는 그 기능을 손댈 때 본다.</p>
       <h3>실습</h3>
       <div class="code">
         <div class="code-head">BASH</div>
@@ -248,16 +240,15 @@ curl -X POST http://localhost:10302/api/auth/login \
   -H "Content-Type: application/json" \
   --data-binary @/tmp/login.json</pre>
       </div>
-      <p>받은 토큰을 다음 요청에 넣어보고, 3.3의 흐름과 맞춰본다. 액세스 토큰 만료는 1시간(<code>expiresIn(3600L)</code>, AuthController 151줄).</p>
+      <p>받은 토큰을 다음 요청에 넣어 보고 3.3 의 흐름과 맞춰 본다. 액세스 토큰은 한 시간 뒤 만료된다(<code>expiresIn(3600L)</code>, AuthController 151줄).</p>
       <div class="note">
-        <p>계정 잠금 시 해제: <code>UPDATE users SET loginFailCount=0, accountNonLocked=1 WHERE username='&lt;username&gt;';</code> (DB 컬럼은 camelCase)</p>
+        <p>계정이 잠겼으면 <code>UPDATE users SET loginFailCount=0, accountNonLocked=1 WHERE username='&lt;username&gt;';</code> 로 푼다. 컬럼 이름이 camelCase 인 점이 처음엔 낯설다.</p>
       </div>
     </section>
     <section id="s5">
       <h2><span class="num">05</span><span>[0단계] permission — 권한</span></h2>
-      <p class="lede">코드보다 DB 를 먼저 보는 모듈. 엔티티 9개와 시드 함정.</p>
-      <p><strong>코드보다 DB를 먼저 보는 게 빠른 모듈이다.</strong> 70개 파일이지만 엔티티 9개가 전부다.</p>
-      <h3>엔티티 9개 (permission/entity/)</h3>
+      <p class="lede">코드보다 DB 를 먼저 본다. 엔티티 아홉과 시드 함정, 그리고 7월 이후 가장 많이 바뀐 자리.</p>
+      <p>이 모듈은 코드보다 DB 를 먼저 보는 쪽이 빠르다. 70개 파일이 있지만 엔티티 아홉 개가 전부이고, 나머지는 그 아홉을 읽고 쓰는 손이다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>엔티티</th><th>용도</th></tr></thead>
@@ -272,7 +263,7 @@ curl -X POST http://localhost:10302/api/auth/login \
           </tbody>
         </table>
       </div>
-      <h3>실습 (코드 읽기보다 이게 빠름)</h3>
+      <h3>실습</h3>
       <div class="code">
         <div class="code-head">SQL</div>
 <pre>SELECT * FROM dynamic_roles;
@@ -280,15 +271,22 @@ SELECT * FROM user_dynamic_roles WHERE user_id = (SELECT id FROM users WHERE use
 SELECT * FROM permissions LIMIT 20;</pre>
       </div>
       <h3>2026-10 기준으로 알아둘 것</h3>
-      <ul><li><strong>API 인가는 인증 여부로만</strong> 한다. <code>@PreAuthorize</code> 1,600여 건 중 <code>isAuthenticated()</code> 1,495건, <code>hasFeature(...)</code> 110여 건, <code>hasRole('ADMIN')</code> <strong>1건</strong>. 역할 문자열을 코드에 박지 않는다(CRITICAL 19 · 27).</li><li>메뉴 노출은 BE <code>menu-definition.json</code> 이 정하고 메뉴마다 <code>PERM_{코드}_ACCESS</code> 권한 행이 자동 생성된다(CRITICAL 20).</li><li>자세한 구조는 <strong>02 권한 가이드</strong>.</li></ul>
+      <p>7월과 가장 많이 달라진 자리가 여기다. 그때는 <code>@PreAuthorize("hasRole('ADMIN')")</code> 이 467건으로 1위였다. 지금은 1건이다. 1,495건이 <code>isAuthenticated()</code> 이고 110건쯤이 <code>hasFeature(...)</code> 다. 역할 문자열을 코드에 박지 않는다는 규칙(CRITICAL 19 · 27)이 그 사이에 저장소 전체를 지나갔다. 메뉴 노출은 BE 의 <code>menu-definition.json</code> 이 정하고, 메뉴마다 <code>PERM_{코드}_ACCESS</code> 권한 행이 자동으로 생긴다(CRITICAL 20). 자세한 구조는 다음 글, 인증·권한·메뉴 체계에서 다룬다.</p>
       <h3>함정</h3>
-      <ul><li><code>@PreAuthorize</code> 를 쓰려면 <code>@EnableMethodSecurity(prePostEnabled = true)</code> 가 필요하다 — 보안 설정 3개와 <code>permission/config/PermissionSecurityConfig</code> 에 붙어 있다</li><li><strong>새 DB 구축 시 <code>dynamic_roles</code> id=1/2/3 시드 필요</strong> — <code>aws-deploy/README.md</code> 는 <code>seed_dynamic_roles.sql</code> 을 먼저 실행하라고 하는데, <strong>그 파일이 저장소에 없다(2026-10-12 확인).</strong> <code>V10.2__create_dynamic_roles_table.sql</code> 과 <code>mariadb/beforeEachMigrate__bootstrap_chat_execution_cancel_roles.sql</code> 이 관련 시드를 담고 있으니 신규 DB 구축 전에 빈 DB 로 Flyway 를 끝까지 돌려 확인할 것</li></ul>
+      <div class="note is-warn">
+        <p class="note-title"><code>@PreAuthorize</code> 는 스위치가 켜져 있어야 동작한다.</p>
+        <p><code>@EnableMethodSecurity(prePostEnabled = true)</code> 가 보안 설정 세 개와 <code>permission/config/PermissionSecurityConfig</code> 에 붙어 있다. 이게 빠지면 애너테이션은 에러 없이 무시된다.</p>
+      </div>
+      <div class="note is-warn">
+        <p class="note-title">새 DB 는 <code>dynamic_roles</code> id 1/2/3 시드가 먼저다.</p>
+        <p><code>aws-deploy/README.md</code> 는 <code>seed_dynamic_roles.sql</code> 을 먼저 실행하라고 하는데, 그 파일이 저장소에 없다(2026-10-12 확인). <code>V10.2__create_dynamic_roles_table.sql</code> 과 <code>mariadb/beforeEachMigrate__bootstrap_chat_execution_cancel_roles.sql</code> 이 관련 시드를 담고 있으니, 신규 DB 를 만들기 전에 빈 DB 로 Flyway 를 끝까지 돌려 보는 편이 안전하다.</p>
+      </div>
     </section>
     <section id="s6">
-      <h2><span class="num">06</span><span>[1단계] stt — 패턴 체득 실질적 시작점</span></h2>
-      <p class="lede">가장 작은 모듈로 모듈 구조 패턴을 몸에 익힌다. 별도 글(03)로 분리.</p>
-      <p><strong>→ 별도 문서 <a href="./03_STT_MODULE_GUIDE.md">03_STT_MODULE_GUIDE.md</a> 로 분리했다 (2026-10-12).</strong></p>
-      <p>7월엔 28개 파일이었는데 지금은 65개다. 늘어난 37개는 대부분 계보 기록(<code>lineage/</code>)과 AI 전송 정책(<code>policy/</code>)이라 1단계에서는 건너뛴다. 읽을 파일 6개와 순서는 그대로다.</p>
+      <h2><span class="num">06</span><span>[1단계] stt — 패턴 체득, 실질적 시작점</span></h2>
+      <p class="lede">가장 작은 모듈로 손을 만든다. 글 하나로 따로 뗐다.</p>
+      <p>이 단계는 글 하나로 따로 뗐다. <strong><a href="/advisor/stt-module.html">stt 모듈 — 모듈 구조 패턴 체득</a></strong> 을 읽는다.</p>
+      <p>7월에 28개 파일이던 모듈이 지금은 65개다. 늘어난 37개는 대부분 통화의 계보를 기록하는 <code>lineage/</code> 와 발화를 외부 AI 로 보내도 되는지 판정하는 <code>policy/</code> 인데, 1단계에서는 둘 다 건너뛴다. 읽을 파일 여섯과 순서는 그대로다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>1) entity/STTEvent.java          통화 시작·종료 이벤트  (88줄)
@@ -298,14 +296,12 @@ SELECT * FROM permissions LIMIT 20;</pre>
 5) service/STTService.java       saveSTTMessage (173~349줄) 만
 6) ingest/SttIngestFilter.java   인입 필터 (183줄, 전부)</pre>
       </div>
-      <p>목표는 STT 지식이 아니라 <strong>모듈 구조 패턴 체득</strong>이다. 여기를 뚫으면 나머지 60개 모듈에서 "어디를 보면 되는지"를 알게 된다.</p>
-      <h3>보너스: <code>counseltype</code> (35개)</h3>
-      <p>같은 크기대에 <strong>AI 자동 분류·재분류 실행</strong>이 붙은 형태. 2번째 표본으로 좋다. "AI 호출이 붙으면 구조가 어떻게 달라지나"(<code>*Run</code> 엔티티, 동시성 방어 writer)를 볼 수 있다. 03 문서 9절.</p>
+      <p>목표는 STT 를 아는 것이 아니다. 모듈 하나를 여는 손을 만드는 것이다. 여기를 지나면 나머지 60개 모듈에서 어디를 봐야 할지 몸이 먼저 안다. 같은 크기대에 AI 자동 분류가 붙은 <code>counseltype</code>(35개)을 두 번째 표본으로 보면 "AI 호출이 붙으면 구조가 어떻게 달라지나"까지 보인다.</p>
     </section>
     <section id="s7">
       <h2><span class="num">07</span><span>[2단계] evaluation — 핵심 업무 도메인</span></h2>
-      <p class="lede">제품의 심장. 테이블 5개 관계와 상태 전이, 스케줄러 6개의 역할.</p>
-      <p><strong>제품의 심장.</strong> 282개지만 여기만 제대로 알면 고객 대응 대부분이 커버된다.</p>
+      <p class="lede">제품의 심장. 테이블 다섯의 관계와 상태 전이, 그리고 Cron 을 보는 스케줄러는 하나뿐이라는 것.</p>
+      <p>제품의 심장이다. 282개 파일이지만 여기만 제대로 알면 고객 문의의 대부분을 혼자 받을 수 있다.</p>
       <h3>테이블 5개 관계</h3>
       <div class="code">
         <div class="code-head">도식</div>
@@ -330,15 +326,15 @@ evaluation_schedule_config   계획별 실행 스케줄 (next_execution_at · lo
       - checkAndExecuteSchedules()   (445줄) 실행 폴링 진입점
       - resolveScheduledTargets()    대상 선정 규칙 — 실제 구현은 EvaluationExecutionServiceImpl 251줄</pre>
       </div>
-      <h3>핵심 개념 — 상태 전이</h3>
+      <h3>상태 전이</h3>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>PENDING → DATA_READY → IN_PROGRESS → COMPLETED
                             ↓
                    SKIPPED / FAILED / EXPIRED</pre>
       </div>
-      <p><strong><code>DATA_READY</code> 상태만 평가 대상으로 선정된다.</strong> 이것만 기억해도 절반이다.</p>
-      <h3>핵심 개념 — 대상 선택 방식</h3>
+      <p>평가 대상으로 뽑히는 건 <code>DATA_READY</code> 하나뿐이다. 이것만 기억해도 평가 문의의 절반은 풀린다.</p>
+      <h3>대상 선택 방식</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>값</th><th>화면 표기</th><th>조회 조건</th></tr></thead>
@@ -348,25 +344,26 @@ evaluation_schedule_config   계획별 실행 스케줄 (next_execution_at · lo
           </tbody>
         </table>
       </div>
-      <h3>헷갈리기 쉬운 것 — 스케줄러가 6개다</h3>
-      <p>평가 계획에 설정한 Cron은 <strong>이 중 1개에만 적용</strong>된다. 나머지는 24시간 상시 동작한다. (2026-10-12 재확인, 전부 그대로)</p>
+      <h3>헷갈리기 쉬운 것 — 스케줄러가 여섯이다</h3>
+      <p>평가 계획 화면에서 Cron 을 설정하면 여섯 개가 전부 그 시각에 맞춰 도는 줄 알기 쉽다. 그 Cron 을 보는 건 하나뿐이고 나머지 다섯은 하루 종일 자기 박자로 돈다. 2026-10-12 에 다시 확인했는데 주기는 7월과 같다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>스케줄러</th><th>주기</th><th>위치</th><th>Cron 적용</th></tr></thead>
           <tbody>
-            <tr><td class="wrap">평가 실행 폴링 (<code>checkAndExecuteSchedules</code>)</td><td class="wrap">60초 (<code>poll-interval-seconds</code>)</td><td>SchedulerServiceImpl 444줄</td><td><strong>적용</strong></td></tr>
-            <tr><td class="wrap">STT 자동 수집 (<code>EvaluationTargetCollectScheduler</code>)</td><td class="wrap">10분 (<code>collect.scheduler.interval-ms</code>)</td><td>scheduler/</td><td>미적용 (상시)</td></tr>
-            <tr><td class="wrap">대상 자동 동기화 (<code>EvaluationTargetSyncScheduler</code>)</td><td>1분 폴링</td><td>scheduler/ 28줄</td><td>미적용 (상시)</td></tr>
-            <tr><td class="wrap">중단 실행 정리 (<code>cleanupStaleExecutions</code>)</td><td>15분</td><td>SchedulerServiceImpl 168줄</td><td>미적용 (상시)</td></tr>
-            <tr><td>만료 락 해제</td><td>5분</td><td>SchedulerServiceImpl 922줄</td><td>미적용 (상시)</td></tr>
-            <tr><td>로그 보관 정리</td><td>매일 03:00</td><td>SyncScheduler 42줄</td><td>미적용 (상시)</td></tr>
+            <tr><td class="wrap">평가 실행 폴링 (<code>checkAndExecuteSchedules</code>)</td><td class="wrap">60초 (<code>poll-interval-seconds</code>)</td><td>SchedulerServiceImpl 444줄</td><td>적용</td></tr>
+            <tr><td class="wrap">STT 자동 수집 (<code>EvaluationTargetCollectScheduler</code>)</td><td class="wrap">10분 (<code>collect.scheduler.interval-ms</code>)</td><td>scheduler/</td><td>상시</td></tr>
+            <tr><td class="wrap">대상 자동 동기화 (<code>EvaluationTargetSyncScheduler</code>)</td><td>1분 폴링</td><td>scheduler/ 28줄</td><td>상시</td></tr>
+            <tr><td class="wrap">중단 실행 정리 (<code>cleanupStaleExecutions</code>)</td><td>15분</td><td>SchedulerServiceImpl 168줄</td><td>상시</td></tr>
+            <tr><td>만료 락 해제</td><td>5분</td><td>SchedulerServiceImpl 922줄</td><td>상시</td></tr>
+            <tr><td>로그 보관 정리</td><td>매일 03:00</td><td>SyncScheduler 42줄</td><td>상시</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="note">
-        <p><strong>실행 판정은 "지금이 Cron 시각인가"가 아니라 "<code>next_execution_at</code> 이 현재를 지났는가"다.</strong> <code>next_execution_at</code> 은 배치 정상 종료 후에만 갱신되므로, 서버가 배치 도중 죽으면 갱신이 안 되어 재기동 후 시간대와 무관하게 1회 실행될 수 있다. → "설정한 시간 외에 평가가 돈다"는 문의의 대표 원인.</p>
+      <div class="note is-warn">
+        <p class="note-title">실행 판정은 "지금이 Cron 시각인가"가 아니다.</p>
+        <p>"<code>next_execution_at</code> 이 현재를 지났는가"다. 이 값은 배치가 정상 종료한 뒤에만 갱신되기 때문에, 서버가 배치 도중 죽으면 재기동 후 시간대와 무관하게 한 번 더 돈다. "설정한 시간 외에 평가가 돌았다"는 문의가 오면 먼저 여기를 본다.</p>
       </div>
-      <h3>진단 쿼리 (실무 직결)</h3>
+      <h3>진단 쿼리</h3>
       <div class="code">
         <div class="code-head">SQL</div>
 <pre>SELECT id, plan_id, cron_expression, last_executed_at, next_execution_at,
@@ -376,11 +373,12 @@ FROM evaluation_schedule_config;</pre>
     </section>
     <section id="s8">
       <h2><span class="num">08</span><span>[3~6단계] 개요</span></h2>
-      <p class="lede">나머지 단계는 지도만 그려 둔다. 필요해질 때 돌아온다.</p>
+      <p class="lede">지도만 그려 둔다. 길은 필요해질 때 걷는다.</p>
+      <p>여기부터는 지도만 그려 둔다. 길은 필요해질 때 걷는다.</p>
       <h3>3단계 — <code>recording</code> (112) → <code>sttanalytics</code> (153)</h3>
-      <p>통화가 외부에서 어떻게 들어와 분석되는지. <code>recording</code> 은 고객사 DB(뷰 테이블) 연동 수집기가 핵심 — <code>recording/collector/impl/</code> 에 Oracle / MariaDB / API / FTP / SFTP / SCP / Local <strong>7종</strong> 수집기가 있다.</p>
-      <h3>4단계 — <code>ai</code> (1,227) — <strong>전부 보지 말 것</strong></h3>
-      <p>3개 서브패키지만 본다:</p>
+      <p>통화가 밖에서 어떻게 들어와 분석되는지. <code>recording</code> 의 중심은 고객사 DB 의 뷰 테이블을 읽어 오는 수집기들이고, <code>recording/collector/impl/</code> 에 Oracle, MariaDB, API, FTP, SFTP, SCP, Local 일곱 종류가 나란히 있다.</p>
+      <h3>4단계 — <code>ai</code> (1,227) — 전부 보지 말 것</h3>
+      <p>세 서브패키지만 본다. 이 셋을 알아야 다른 모듈의 AI 호출부가 읽힌다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>패키지</th><th>내용</th></tr></thead>
@@ -391,16 +389,14 @@ FROM evaluation_schedule_config;</pre>
           </tbody>
         </table>
       </div>
-      <p>이걸 알아야 다른 모듈의 AI 호출부가 이해된다.</p>
       <h3>5단계 — <code>rag</code> (274) → <code>kms</code> (774)</h3>
       <p>벡터 검색(PostgreSQL pgvector)과 지식베이스.</p>
       <h3>6단계 — <code>orchestration</code> (515) → <code>agi</code> (713)</h3>
-      <p>워크플로우 빌더, 자율 에이전트. <strong>가장 어렵고 가장 자주 바뀐다.</strong> 착수 전 반드시 아래를 먼저 읽을 것:</p>
-      <ul><li><code>claudedocs/agi/AGI_TOOL_ENHANCEMENT_ANALYSIS.md</code></li><li><code>claudedocs/orchestration/README.md</code></li></ul>
+      <p>워크플로우 빌더와 자율 에이전트. 가장 어렵고 가장 자주 바뀐다. 손대기 전에 <code>claudedocs/agi/AGI_TOOL_ENHANCEMENT_ANALYSIS.md</code> 와 <code>claudedocs/orchestration/README.md</code> 를 먼저 읽는다.</p>
     </section>
     <section id="s9">
       <h2><span class="num">09</span><span>자주 쓰는 명령어</span></h2>
-      <p class="lede">매일 치는 명령과 포트 번호.</p>
+      <p class="lede">매일 치는 명령과 포트.</p>
       <h3>백엔드</h3>
       <div class="code">
         <div class="code-head">BASH</div>
@@ -410,11 +406,10 @@ bash scripts/ci/test-chunked.sh          # 회귀 테스트 — 묶음 순차 (�
 ./gradlew test --tests "ClassName"       # 단일 테스트
 ./gradlew bootJar                        # 배포용 JAR</pre>
       </div>
-      <div class="note is-warn">
-        <p class="note-title">함정</p>
-        <p>로컬 BE 가 떠 있는 동안 다른 gradle 태스크를 돌리면 BE 가 죽는다. 라이브 검증 중엔 컴파일도 미룬다.</p>
+      <div class="note">
+        <p>로컬 BE 가 떠 있는 동안 다른 gradle 태스크를 돌리면 BE 가 죽는다. 라이브 검증 중에는 컴파일도 미룬다.</p>
       </div>
-      <h3>프론트엔드 (React — 단일 트랙, Vue <code>stt-client/</code> 는 삭제됨)</h3>
+      <h3>프론트엔드 (React 단일 트랙, Vue <code>stt-client/</code> 는 삭제됐다)</h3>
       <div class="code">
         <div class="code-head">BASH</div>
 <pre>cd web-react
@@ -437,42 +432,35 @@ npm test             # vitest (순차, CRITICAL 24)</pre>
     </section>
     <section id="s10">
       <h2><span class="num">10</span><span>지뢰밭 — 모르고 밟으면 장애</span></h2>
-      <p class="lede">모르고 밟으면 장애로 이어지는 규칙. 초반에 특히 자주 밟는 것만.</p>
-      <p>전체 목록: <code>AGENTS.md</code> CRITICAL 인덱스(28개) + <code>claudedocs/08_backend_services/CODE_REVIEW_CHECKLIST.md</code> 아래는 <strong>초반에 특히 자주 밟는 것</strong>만 추렸다. 번호는 CRITICAL 번호다.</p>
+      <p class="lede">모르고 밟으면 장애가 되는 규칙. 초반에 자주 밟는 것만.</p>
+      <p>전체 목록은 <code>AGENTS.md</code> 의 CRITICAL 인덱스 28개와 <code>CODE_REVIEW_CHECKLIST.md</code> 에 있다. 아래는 초반에 유난히 자주 밟는 것만 추렸다. 번호는 CRITICAL 번호다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>#</th><th>내용</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td class="wrap">Flyway DDL은 전부 <code>IF NOT EXISTS</code> / <code>IF EXISTS</code></td></tr>
-            <tr><td>2</td><td class="wrap">Entity 변경 시 <strong>같은 PR에 Flyway 마이그레이션</strong> 필수</td></tr>
+            <tr><td>1</td><td class="wrap">Flyway DDL 은 전부 <code>IF NOT EXISTS</code> / <code>IF EXISTS</code></td></tr>
+            <tr><td>2</td><td class="wrap">Entity 변경 시 같은 PR 에 Flyway 마이그레이션</td></tr>
             <tr><td>3</td><td class="wrap">외부 호출은 <code>@CircuitBreaker</code> + null-safe fallback</td></tr>
-            <tr><td>6</td><td class="wrap"><strong>중첩 <code>@Transactional(REQUIRES_NEW)</code> 금지</strong> → 이벤트 기반으로 분리</td></tr>
+            <tr><td>6</td><td class="wrap">중첩 <code>@Transactional(REQUIRES_NEW)</code> 금지 → 이벤트 기반으로 분리</td></tr>
             <tr><td>7</td><td class="wrap">모든 <code>@Transactional</code> 에 <code>timeout</code> 명시 (기본 10초)</td></tr>
-            <tr><td>8</td><td class="wrap"><strong><code>readOnly</code> 트랜잭션 안에서 LLM·외부 I/O 호출 금지</strong></td></tr>
-            <tr><td>11</td><td class="wrap"><strong>LLM 호출에 <code>@Retry</code> 금지</strong> (<code>@CircuitBreaker</code> 만)</td></tr>
-            <tr><td>12</td><td class="wrap"><code>@TransactionalEventListener(AFTER_COMMIT)</code> 는 <strong>self-call 금지</strong> (AOP 우회)</td></tr>
-            <tr><td>19</td><td class="wrap">API 인가는 인증 여부로만 — <strong>role 하드코딩 금지</strong></td></tr>
+            <tr><td>8</td><td class="wrap"><code>readOnly</code> 트랜잭션 안에서 LLM·외부 I/O 호출 금지</td></tr>
+            <tr><td>11</td><td class="wrap">LLM 호출에 <code>@Retry</code> 금지 (<code>@CircuitBreaker</code> 만)</td></tr>
+            <tr><td>12</td><td class="wrap"><code>@TransactionalEventListener(AFTER_COMMIT)</code> 는 self-call 금지 (AOP 우회)</td></tr>
+            <tr><td>19</td><td class="wrap">API 인가는 인증 여부로만 — role 하드코딩 금지</td></tr>
             <tr><td>20</td><td class="wrap">메뉴는 BE <code>menu-definition.json</code> 이 SSOT — FE 는 레지스트리만</td></tr>
-            <tr><td>28</td><td class="wrap">⛔ 운영 DB 직접 조작 금지 — Flyway + 배포 파이프라인으로만</td></tr>
+            <tr><td>28</td><td class="wrap">운영 DB 직접 조작 금지 — Flyway + 배포 파이프라인으로만</td></tr>
             <tr><td>—</td><td class="wrap">Virtual Thread 활성 상태 → <code>synchronized</code> 안에서 I/O 금지 (pinning)</td></tr>
             <tr><td>—</td><td class="wrap">FK 멱등 추가에 <code>ADD CONSTRAINT IF NOT EXISTS FOREIGN KEY</code> 금지 (MariaDB 미지원)</td></tr>
-            <tr><td>—</td><td class="wrap">데이터 INSERT 마이그레이션은 <code>created_at</code> / <code>updated_at</code> 값을 <code>NOW()</code> 로 <strong>명시</strong></td></tr>
+            <tr><td>—</td><td class="wrap">데이터 INSERT 마이그레이션은 <code>created_at</code> / <code>updated_at</code> 값을 <code>NOW()</code> 로 명시</td></tr>
           </tbody>
         </table>
       </div>
     </section>
     <section id="s11">
       <h2><span class="num">11</span><span>최종 자가진단</span></h2>
-      <p class="lede">0~2단계가 끝났는지 8문항으로 확인한다.</p>
-      <p>아래에 답할 수 있으면 0~2단계 완료다.</p>
-      <h3>구조</h3>
-      <ol><li>새 기능의 REST API를 추가하려면 어떤 디렉토리에 무슨 파일을 만드나?</li><li>임의의 모듈에서 "이 API가 뭘 하는지" 5분 안에 찾아갈 수 있나?</li></ol>
-      <h3>인증·권한</h3>
-      <ol><li>특정 URL이 인증 없이 열려 있는지 어디서 확인하나?</li><li>403이 떴을 때 확인 순서는?</li></ol>
-      <h3>데이터</h3>
-      <ol><li>Entity를 수정했다. 그다음 반드시 해야 할 일은?</li><li>새 모듈의 Repository 빈을 못 찾는다면 어디를 보나?</li></ol>
-      <h3>업무 도메인</h3>
-      <ol><li>평가 대상이 <code>DATA_READY</code> 가 아니면 어떻게 되나?</li><li>설정한 Cron 시간이 아닌데 평가가 돌았다. 어디를 확인하나?</li></ol>
+      <p class="lede">여덟 문항. 답할 수 있으면 0~2단계가 끝난 것이다.</p>
+      <p>아래에 답할 수 있으면 0~2단계가 끝난 것이다.</p>
+      <ol><li>새 기능의 REST API 를 추가하려면 어떤 디렉토리에 무슨 파일을 만드나?</li><li>임의의 모듈에서 "이 API 가 뭘 하는지" 5분 안에 찾아갈 수 있나?</li><li>특정 URL 이 인증 없이 열려 있는지 어디서 확인하나?</li><li>403 이 떴을 때 확인 순서는?</li><li>Entity 를 수정했다. 그다음 반드시 해야 할 일은?</li><li>새 모듈의 Repository 빈을 못 찾는다면 어디를 보나?</li><li>평가 대상이 <code>DATA_READY</code> 가 아니면 어떻게 되나?</li><li>설정한 Cron 시간이 아닌데 평가가 돌았다. 어디를 확인하나?</li></ol>
     </section>
 
     <hr class="rule">
@@ -480,9 +468,9 @@ npm test             # vitest (순차, CRITICAL 24)</pre>
     <div class="closing">
       <h2><span class="num">■</span><span>기억할 것</span></h2>
       <ol>
-        <li><strong>전부 이해는 불가능하다.</strong> 목표는 필요한 부분에 빠르게 도달하는 능력이다. 0~2단계가 전체의 약 9%다.</li>
-        <li><strong>모듈은 전부 같은 구조다.</strong> entity 로 명사를, DB 로 실데이터를, controller 로 동사를 보고 service 메서드 하나를 끝까지 추적한다.</li>
-        <li><strong>DB SELECT 를 건너뛰지 않는다.</strong> 실제 데이터 10건을 보면 코드가 갑자기 읽힌다.</li>
+        <li><strong>전부 이해하는 건 목표가 아니다.</strong> 필요한 자리에 빠르게 도달하는 능력이 목표다. 0~2단계가 전체 Java 파일의 9% 남짓이다.</li>
+        <li><strong>모듈은 전부 같은 손으로 열린다.</strong> entity 로 명사를, DB 로 실데이터를, controller 로 동사를 보고 service 메서드 하나를 끝까지 따라간다.</li>
+        <li><strong>DB SELECT 를 건너뛰지 않는다.</strong> 실제 행 열 개를 본 뒤에 엔티티를 다시 열면 컬럼 이름이 아는 얼굴이 된다.</li>
         <li><strong>6단계는 필요해지기 전에 손대지 않는다.</strong> 가장 어렵고 가장 자주 바뀐다.</li>
       </ol>
     </div>

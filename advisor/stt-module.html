@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="가장 작은 업무 모듈 하나로 &#x27;모듈 읽는 법&#x27;을 익힌다. 통화 이벤트와 발화를 받아 저장하고, 실시간으로 뿌리고, 통화가 끝나면 다른 모듈에 알리는 입구 모듈.">
+<meta name="description" content="가장 작은 업무 모듈 하나로 모듈 읽는 손을 만든다. 통화 이벤트와 발화가 처음 닿는 강어귀. 파일 여섯, 메서드 둘.">
 <title>stt 모듈 — 모듈 구조 패턴 체득</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +39,7 @@
     <p class="eyebrow">모듈 읽기 · 1단계</p>
     <h1>stt 모듈 — 모듈 구조 패턴 체득</h1>
     <p class="standfirst">
-      가장 작은 업무 모듈 하나로 '모듈 읽는 법'을 익힌다. 외부 STT 엔진이 보내는 통화 이벤트와 발화를 받아 저장하고, 실시간으로 뿌리고, 통화가 끝나면 다른 모듈에 알리는 <strong>입구 모듈</strong>이다. 파일 6개, 메서드 2개만 끝까지 따라가면 나머지 60개 모듈에서 어디를 봐야 할지 알게 된다.
+      stt 는 강어귀다. 바깥에서 흘러온 통화 이벤트와 발화가 처음 닿는 자리이고, 여기서 하는 일은 받아 두고 어디로 흘려보낼지 정하는 것뿐이다. 분석도 평가도 하지 않는다. 그래서 가장 작고, 그래서 모듈 하나를 읽는 손을 만들기에 가장 좋다. 파일 여섯과 메서드 둘을 끝까지 따라가면 나머지 <strong>60개 모듈</strong>에서 어디를 봐야 할지 몸이 먼저 안다.
     </p>
 
     <div class="meta-strip">
@@ -51,35 +51,27 @@
 
     <section id="s0">
       <h2><span class="num">00</span><span>이 단계의 목표</span></h2>
-      <p class="lede">STT 전문가가 아니라 '모듈 읽는 손'을 만드는 단계. 7월 가이드 이후 바뀐 것부터.</p>
-      <p><strong>STT 전문가가 되는 게 아니다.</strong> 목표는 하나다.</p>
-      <div class="note">
-        <p>아무 모듈이나 열었을 때 "entity 보고 → DB 보고 → controller 보고 → service 메서드 하나 추적" 이 손에 붙는 것.</p>
-      </div>
-      <p>stt 는 그 연습용 표본이다. 여기서 익힌 루틴을 2단계 <code>evaluation</code>(275개 파일)에서 그대로 쓴다.</p>
-      <h3>가이드 작성 뒤 바뀐 것 (주의)</h3>
-      <p>01 가이드(7월 27일)는 stt 를 "28개 파일"이라고 썼다. <strong>지금은 65개다.</strong> 두 달 반 사이 21개 커밋이 들어갔다.</p>
+      <p class="lede">STT 가 아니라 손을 익히는 단계. 7월 뒤에 바뀐 것부터.</p>
+      <p>STT 전문가가 되려는 게 아니다. 아무 모듈이나 열었을 때 손이 먼저 움직이게 하려는 것이다. 엔티티를 보고, DB 를 보고, 컨트롤러를 보고, 서비스 메서드 하나를 끝까지 따라가는 그 순서가 몸에 붙는 것. stt 는 그 연습용 표본이다. 여기서 익힌 손으로 2단계 <code>evaluation</code> 의 282개 파일을 연다.</p>
+      <h3>7월 가이드 뒤에 바뀐 것</h3>
+      <p>7월 학습 가이드는 stt 를 "28개 파일"이라고 썼다. 지금은 65개다. 두 달 반 사이 커밋 21개가 들어왔고 하위 패키지가 일곱에서 열둘로 늘었다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>항목</th><th>7월 27일</th><th>지금</th></tr></thead>
           <tbody>
-            <tr><td>Java 파일</td><td>28</td><td><strong>65</strong></td></tr>
-            <tr><td>하위 패키지</td><td>7</td><td class="wrap"><strong>12</strong> (<code>lineage</code> · <code>policy</code> · <code>enums</code> · <code>logging</code> · <code>util</code> 추가)</td></tr>
+            <tr><td>Java 파일</td><td>28</td><td>65</td></tr>
+            <tr><td>하위 패키지</td><td>7</td><td class="wrap">12 (<code>lineage</code> · <code>policy</code> · <code>enums</code> · <code>logging</code> · <code>util</code> 추가)</td></tr>
             <tr><td class="scope-name"><code>STTController</code></td><td>—</td><td>1,285줄</td></tr>
             <tr><td class="scope-name"><code>STTService</code></td><td>—</td><td>2,077줄</td></tr>
           </tbody>
         </table>
       </div>
-      <p>늘어난 37개는 대부분 <strong>두 가지 신규 관심사</strong>다. 1단계에서는 둘 다 <strong>건너뛴다.</strong></p>
-      <ul><li><code>lineage/</code> (12개) — 한 통화가 어느 경로(실시간·녹취 동기화·가져오기)로 들어왔는지 추적하는 계보 기록</li><li><code>policy/</code> (14개) — 발화를 외부 AI 로 보내도 되는지(공공/민간 분류) 판정하는 정책 엔진</li></ul>
-      <p>핵심 흐름은 7월과 같다. <strong>읽을 파일 6개도 그대로 있다.</strong></p>
+      <p>늘어난 37개는 대부분 두 가지 새 관심사다. <code>lineage/</code> 열두 개는 한 통화가 어느 길로 들어왔는지(실시간인지, 녹취 동기화인지, 가져오기인지)를 기록하는 계보이고, <code>policy/</code> 열네 개는 발화를 외부 AI 로 보내도 되는지 공공과 민간을 가려 판정하는 정책 엔진이다. 둘 다 1단계에서는 건너뛴다. 핵심 흐름은 7월과 같고 읽을 파일 여섯도 그대로 있다.</p>
     </section>
     <section id="s1">
       <h2><span class="num">01</span><span>이 모듈이 하는 일 (한 문장)</span></h2>
-      <p class="lede">입구 모듈이다. 받고, 저장하고, 뿌리고, 끝났다고 알린다.</p>
-      <div class="note">
-        <p>교환기(교환기 연동 시스템)·AI 소프트폰·배치 수집기가 보내는 <strong>통화 시작/종료 이벤트</strong>와 <strong>발화 문장</strong>을 받아, <strong>저장하고, 실시간 화면으로 뿌리고, 통화가 끝나면 "끝났다"고 다른 모듈에 알린다.</strong></p>
-      </div>
+      <p class="lede">강어귀. 받고, 저장하고, 흘려보내고, 끝났다고 알린다.</p>
+      <p>교환기와 AI 소프트폰과 배치 수집기가 보내는 통화 시작·종료 이벤트와 발화 문장을 받아, 저장하고, 실시간 화면으로 뿌리고, 통화가 끝나면 다른 모듈에 "끝났다"고 알린다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre> 외부 STT 엔진 ──POST /api/stt/event (S/E)──▶ ┐
@@ -92,60 +84,58 @@
                                    assist(상담보조 세션 종료) · orchestration(워크플로우 트리거)
                                    addressbot · simulation  ← 다른 모듈이 구독</pre>
       </div>
-      <p><strong>stt 모듈은 "입구"다.</strong> 분석·평가·요약은 하지 않는다. 그건 <code>sttanalytics</code>(3단계)·<code>evaluation</code>(2단계)·<code>assist</code> 가 이 모듈이 발행한 이벤트를 받아서 한다.</p>
+      <p>stt 는 강어귀다. 바깥에서 흘러온 물이 처음 닿는 자리이고, 여기서 하는 일은 물을 받아 두고 어디로 흘려보낼지 정하는 것뿐이다. 분석도 평가도 요약도 하지 않는다. 그 일은 <code>sttanalytics</code>(3단계)와 <code>evaluation</code>(2단계)과 <code>assist</code> 가 이 모듈이 띄운 이벤트를 받아서 한다.</p>
     </section>
     <section id="s2">
       <h2><span class="num">02</span><span>읽는 순서 (6개 파일, 이 순서대로)</span></h2>
-      <p class="lede">6개 파일과 각 파일에서 볼 줄 범위.</p>
+      <p class="lede">파일 여섯과 각 파일에서 볼 줄 범위.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>#</th><th>파일</th><th>줄 수</th><th>읽는 법</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td><code>entity/STTEvent.java</code></td><td>88</td><td><strong>전부.</strong> 컬럼 7개만 보면 된다</td></tr>
-            <tr><td>2</td><td><code>entity/STTMessage.java</code></td><td>202</td><td>컬럼 부분만. 메서드 2개는 4절에서 설명</td></tr>
-            <tr><td>3</td><td><strong>DB SELECT</strong></td><td>—</td><td>5절 쿼리 실행. <strong>건너뛰지 말 것</strong></td></tr>
-            <tr><td>4</td><td class="wrap"><code>controller/STTController.java</code></td><td>1,285</td><td class="wrap"><strong>78~190줄 <code>receiveSTTMessage</code> 만.</strong> 나머지는 목록만 훑기</td></tr>
-            <tr><td>5</td><td><code>service/STTService.java</code></td><td>2,077</td><td class="wrap"><strong>173~349줄 <code>saveSTTMessage</code> 만</strong></td></tr>
+            <tr><td>1</td><td><code>entity/STTEvent.java</code></td><td>88</td><td>전부. 컬럼 일곱 개만 보면 된다</td></tr>
+            <tr><td>2</td><td><code>entity/STTMessage.java</code></td><td>202</td><td>컬럼 부분만. 메서드 둘은 4절에서</td></tr>
+            <tr><td>3</td><td>DB SELECT</td><td>—</td><td>5절 쿼리 실행. 건너뛰지 않는다</td></tr>
+            <tr><td>4</td><td class="wrap"><code>controller/STTController.java</code></td><td>1,285</td><td class="wrap">78~190줄 <code>receiveSTTMessage</code> 만. 나머지는 목록만 훑는다</td></tr>
+            <tr><td>5</td><td><code>service/STTService.java</code></td><td>2,077</td><td class="wrap">173~349줄 <code>saveSTTMessage</code> 만</td></tr>
             <tr><td>6</td><td class="wrap"><code>ingest/SttIngestFilter.java</code></td><td>183</td><td>전부. 짧고 주석이 좋다</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="note">
-        <p>4·5번 파일이 1,000줄이 넘는다고 겁먹지 말 것. 각각 <strong>메서드 하나</strong>만 끝까지 따라가면 된다. 01 가이드 2절의 "관심 있는 메서드 하나만 끝까지 추적"이 이것이다.</p>
-      </div>
+      <p>4번과 5번이 천 줄을 넘는다고 겁먹을 필요는 없다. 각각 메서드 하나만 끝까지 따라가면 된다. 학습 가이드 2절의 "관심 있는 메서드 하나만 끝까지 추적"이 이 얘기다.</p>
     </section>
     <section id="s3">
       <h2><span class="num">03</span><span>entity — 이 도메인의 "명사" 2개</span></h2>
-      <p class="lede">이 도메인의 명사 2개. 화자 판정 컬럼의 함정.</p>
+      <p class="lede">명사 둘. 화자를 적는 칸에 세 가지 뜻이 겹쳐 쌓인 사연.</p>
       <h3>3.1 <code>STTEvent</code> → 테이블 <code>stt_events</code> — 통화의 시작과 끝</h3>
-      <p><strong>통화 1건 = 행 2개</strong> (S 한 줄, E 한 줄). 로컬 DB 86개 통화가 전부 <code>S,E</code> 쌍이다.</p>
+      <p>통화 한 건은 행 두 개로 남는다. <code>S</code> 한 줄, <code>E</code> 한 줄. 로컬 DB 의 통화 86건이 전부 <code>S,E</code> 쌍이었다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>컬럼</th><th>의미</th><th>실데이터 예</th></tr></thead>
           <tbody>
-            <tr><td class="scope-name"><code>call_id</code></td><td>통화 식별자. <strong>외부가 정한다</strong></td><td class="wrap"><code>CALL20260805143000_50000141</code></td></tr>
+            <tr><td class="scope-name"><code>call_id</code></td><td>통화 식별자. 외부가 정한다</td><td class="wrap"><code>CALL20260805143000_50000141</code></td></tr>
             <tr><td class="scope-name"><code>extension_number</code></td><td>상담사 내선(DN)</td><td><code>50000141</code></td></tr>
             <tr><td class="scope-name"><code>user_id</code></td><td>상담사 ID</td><td class="wrap"><code>import</code>, <code>batch</code>, <code>agent01</code></td></tr>
             <tr><td class="scope-name"><code>call_time</code></td><td>시작/종료 시각</td><td><code>2026-08-05 14:30:00</code></td></tr>
-            <tr><td class="scope-name"><code>type</code></td><td><strong><code>S</code>=시작 / <code>E</code>=종료</strong></td><td></td></tr>
+            <tr><td class="scope-name"><code>type</code></td><td><code>S</code>=시작 / <code>E</code>=종료</td><td></td></tr>
             <tr><td class="scope-name"><code>created_at</code></td><td>우리 서버가 받은 시각</td><td></td></tr>
           </tbody>
         </table>
       </div>
-      <p>나머지 컬럼 <code>source_event_id</code> · <code>source_system</code> · <code>source_sequence</code> · <code>*_claimed_at</code> · <code>*_published_at</code> 은 <strong>STT-010 (2026-10-03) 재전송 멱등성</strong> 용이다. "같은 이벤트가 두 번 와도 두 번 처리하지 않기"를 위한 장치인데, <strong>로컬 데이터는 전부 NULL</strong> 이다(레거시 경로). 1단계에서는 "그런 게 있다"만 알고 넘어간다.</p>
+      <p>나머지 컬럼 <code>source_event_id</code>, <code>source_system</code>, <code>source_sequence</code>, 그리고 <code>*_claimed_at</code> 과 <code>*_published_at</code> 은 2026-10-03 에 들어온 재전송 멱등성(STT-010) 장치다. 같은 이벤트가 두 번 와도 두 번 처리하지 않기 위한 것인데, 로컬 데이터는 전부 NULL 이다. 레거시 경로로 들어온 데이터라 그렇다. 1단계에서는 "그런 칸이 있다"까지만 알고 지나간다.</p>
       <h3>3.2 <code>STTMessage</code> → 테이블 <code>stt_messages</code> — 발화 문장 하나</h3>
-      <p><strong>발화 1문장 = 행 1개.</strong> 로컬 DB 2,774행 / 107개 통화 → 통화당 약 26문장.</p>
+      <p>발화 한 문장이 행 하나다. 로컬 DB 에 2,774행, 통화 107건이 있으니 통화당 스물여섯 문장쯤 된다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>컬럼</th><th>의미</th><th>주의</th></tr></thead>
           <tbody>
-            <tr><td class="scope-name"><code>call_id</code></td><td>어느 통화의 문장인가</td><td class="wrap"><code>stt_events.call_id</code> 와 <strong>논리 연결</strong> (FK 없음)</td></tr>
-            <tr><td class="scope-name"><code>call_type</code></td><td><strong>화자.</strong> <code>TX</code>=상담사 / <code>RX</code>=고객</td><td>아래 </td></tr>
-            <tr><td class="scope-name"><code>channel_type</code></td><td><strong><code>@Deprecated</code> — 읽지 말 것</strong></td><td>아래 </td></tr>
+            <tr><td class="scope-name"><code>call_id</code></td><td>어느 통화의 문장인가</td><td class="wrap"><code>stt_events.call_id</code> 와 논리 연결 (FK 없음)</td></tr>
+            <tr><td class="scope-name"><code>call_type</code></td><td>화자. <code>TX</code>=상담사 / <code>RX</code>=고객</td><td>아래 함정</td></tr>
+            <tr><td class="scope-name"><code>channel_type</code></td><td><code>@Deprecated</code> — 읽지 말 것</td><td>아래 함정</td></tr>
             <tr><td class="scope-name wrap"><code>extension_number</code> / <code>user_id</code></td><td>이벤트와 동일</td><td></td></tr>
             <tr><td class="scope-name"><code>start_time</code> / <code>end_time</code></td><td>발화 시각</td><td>DTO 는 epoch ms 로 받아 변환</td></tr>
             <tr><td class="scope-name"><code>offset_ms</code></td><td>통화 시작 기준 몇 ms 지점인가</td><td>Oracle 동기화 데이터만 값 있음</td></tr>
-            <tr><td class="scope-name"><code>text</code></td><td class="wrap"><strong>원문. <code>updatable = false</code></strong> — 절대 안 바뀜</td><td></td></tr>
+            <tr><td class="scope-name"><code>text</code></td><td>원문. <code>updatable = false</code></td><td>절대 안 바뀜</td></tr>
             <tr><td class="scope-name"><code>corrected_text</code></td><td>AI 교정문 (없으면 NULL)</td><td></td></tr>
             <tr><td class="scope-name"><code>correction_status</code></td><td class="wrap"><code>UNCHECKED</code> / <code>APPLIED</code> / <code>FAILED</code></td><td></td></tr>
             <tr><td class="scope-name"><code>customer_type</code></td><td class="wrap"><code>G</code>(민간) / <code>P</code>(공공) — AI 전송 차단 분기</td><td></td></tr>
@@ -153,8 +143,8 @@
           </tbody>
         </table>
       </div>
-      <h3>화자 판정 — <code>call_type</code> 이 정답, <code>channel_type</code> 은 함정</h3>
-      <p>실데이터를 보면 왜 헷갈리는지 바로 보인다.</p>
+      <h3>화자 판정 — <code>call_type</code> 이 정답이고 <code>channel_type</code> 은 함정이다</h3>
+      <p>실데이터를 세어 보면 왜 헷갈리는지 바로 보인다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>call_type  channel_type  건수
@@ -164,21 +154,18 @@ IN         MIX            520   ← 화자 미상 (옛 Oracle 동기화: IN=인�
 TX         VOICE          171   ← 손으로 만든 JSON 가져오기
 TX         TX             161   ← 옛 데이터 (channel_type 에도 화자를 넣던 시절)</pre>
       </div>
-      <p><code>channel_type</code> 한 컬럼에 <strong>테넌트 ID · 화자 · 매체</strong> 세 가지 의미가 섞여 있다(엔티티 주석에 경위가 적혀 있다). 그래서 <strong>화자는 반드시 <code>util/SttSpeakerUtils</code> 를 통해서만 판정한다.</strong></p>
-      <ul><li><code>isAgent(message)</code> → <code>call_type</code> 이 <code>TX</code> 일 때만 true</li><li><code>MIX</code> · <code>VOICE</code> · <code>IN</code> · <code>OUT</code> 은 "화자 모름" → 고객으로 떨어진다(기존 호출부 호환)</li></ul>
-      <div class="note">
-        <p>신규 코드에서 <code>getCallType().equals("TX")</code> 를 직접 쓰지 말 것. 위 유틸이 SSOT 다.</p>
+      <p><code>channel_type</code> 한 칸에 테넌트 ID 와 화자와 매체, 세 가지 뜻이 겹쳐 쌓여 있다. 엔티티 주석에 그 경위가 적혀 있는데, 생산자마다 이 칸에 다른 것을 넣어 보내던 세월이 그대로 지층이 됐다. 그래서 화자는 반드시 <code>util/SttSpeakerUtils</code> 를 거쳐 판정한다. <code>isAgent(message)</code> 는 <code>call_type</code> 이 <code>TX</code> 일 때만 참이고, <code>MIX</code> 나 <code>VOICE</code> 나 <code>IN</code> 처럼 화자를 모르는 값은 기존 호출부와의 호환을 위해 고객 쪽으로 떨어진다.</p>
+      <div class="note is-warn">
+        <p class="note-title">신규 코드에서 <code>getCallType().equals("TX")</code> 를 직접 쓰지 않는다.</p>
+        <p>화자 판정의 SSOT 는 <code>SttSpeakerUtils</code> 하나다.</p>
       </div>
-      <h3>3.3 엔티티 안의 메서드 2개 — "원문은 안 건드린다"</h3>
-      <p><code>STTMessage</code> 에는 <code>initializeCorrection()</code> · <code>applyCorrection()</code> 이 있다. 규칙은 하나다.</p>
-      <div class="note">
-        <p><code>text</code>(원문)는 저장 뒤 절대 수정하지 않는다. 교정은 <code>corrected_text</code> 에 쓰고, 이력은 <code>stt_message_correction_revisions</code> 에 <strong>append-only</strong> 로 쌓는다.</p>
-      </div>
-      <p><code>correction_version</code> 이 1씩 올라가고 revision 행이 하나 추가된다. 로컬 DB 는 revision 0건 — 교정이 돈 적이 없다. (<code>corrected_text</code> 가 2,446건 있는 건 가져오기 때 원문을 복사해 넣은 것이지 교정 결과가 아니다.)</p>
+      <h3>엔티티 안의 메서드 둘 — 원문은 건드리지 않는다</h3>
+      <p><code>STTMessage</code> 에는 <code>initializeCorrection()</code> 과 <code>applyCorrection()</code> 이 있다. 규칙은 하나다. <code>text</code> 는 저장된 뒤 절대 수정하지 않는다. 교정은 <code>corrected_text</code> 에 쓰고, 이력은 <code>stt_message_correction_revisions</code> 에 덧붙이기만 한다. <code>correction_version</code> 이 하나 오르고 revision 행이 하나 늘어난다.</p>
+      <p>로컬 DB 의 revision 은 0건이다. 교정이 돈 적이 없다는 뜻이다. <code>corrected_text</code> 가 2,446건 차 있는 건 가져오기 때 원문을 그대로 복사해 넣은 것이지 교정의 결과가 아니다.</p>
     </section>
     <section id="s4">
       <h2><span class="num">04</span><span>DB 실습 — 코드 전에 데이터부터</span></h2>
-      <p class="lede">코드 전에 데이터. 쿼리 4개.</p>
+      <p class="lede">코드 전에 데이터. 쿼리 넷.</p>
       <div class="code">
         <div class="code-head">BASH</div>
 <pre>docker exec -it mariadb mariadb -u &lt;계정&gt; -p local_db</pre>
@@ -203,31 +190,29 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
        (SELECT COUNT(DISTINCT call_id) FROM stt_messages) AS calls_with_messages;
 <span class="c-dim">-- 로컬: 86 vs 107 → 발화만 있고 이벤트 없는 통화가 21개 (가져오기 경로)</span></pre>
       </div>
-      <p>②를 실행하면 <code>TX</code>(상담사 인사) → <code>RX</code>(고객 용건) → <code>TX</code>(본인확인) … 가 번갈아 나온다. <strong>이 화면을 머리에 넣고 코드를 읽으면 <code>callType</code> 이 뭔지 다시 안 찾아본다.</strong></p>
+      <p>②를 돌리면 <code>TX</code> 의 인사, <code>RX</code> 의 용건, <code>TX</code> 의 본인 확인이 번갈아 내려온다. 이 화면을 한 번 머리에 넣고 나면 코드를 읽다가 <code>callType</code> 이 뭐였는지 다시 찾아보는 일이 없어진다.</p>
     </section>
     <section id="s5">
       <h2><span class="num">05</span><span>controller — 밖에서 할 수 있는 "동사"</span></h2>
-      <p class="lede">밖에서 할 수 있는 동사. 수신 메서드 하나를 7단계로 따라간다.</p>
-      <p><code>@RequestMapping("/api/stt")</code> · 엔드포인트 약 30개. <strong>수신 2개만 중요하고 나머지는 관리 화면용 조회·수정이다.</strong></p>
+      <p class="lede">밖에서 할 수 있는 동사. 수신 메서드 하나를 일곱 단계로 따라간다.</p>
+      <p><code>@RequestMapping("/api/stt")</code> 아래 엔드포인트가 서른 개쯤 있다. 중요한 건 수신 둘이고 나머지는 관리 화면이 쓰는 조회와 수정이다.</p>
       <h3>5.1 수신 2개 (외부 STT 엔진이 호출)</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>메서드</th><th>경로</th><th>보안</th><th>역할</th></tr></thead>
           <tbody>
-            <tr><td>POST</td><td><code>/api/stt/event</code></td><td><strong>permitAll</strong></td><td>통화 시작/종료</td></tr>
-            <tr><td>POST</td><td><code>/api/stt/message</code></td><td><strong>permitAll</strong></td><td>발화 1문장</td></tr>
+            <tr><td>POST</td><td><code>/api/stt/event</code></td><td>permitAll</td><td>통화 시작/종료</td></tr>
+            <tr><td>POST</td><td><code>/api/stt/message</code></td><td>permitAll</td><td>발화 1문장</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="note">
-        <p>02 권한 가이드 자가진단 3번 "<code>/api/stt/message</code> 가 permitAll 인데 왜 안전한가?" 의 현장이다. 외부 교환기는 JWT 를 못 보낸다. 대신 (a) 저장만 하고 아무것도 돌려주지 않는다 (b) 운영은 망 분리·IP 제한 (c) 02 가이드 "permitAll ≠ 무방비" 참조.</p>
-      </div>
+      <p>인증·권한 글의 자가진단 3번, "<code>/api/stt/message</code> 가 permitAll 인데 왜 안전한가"의 현장이 여기다. 외부 교환기는 JWT 를 보낼 줄 모른다. 대신 이 엔드포인트는 저장만 하고 아무것도 돌려주지 않으며, 운영에서는 망 분리와 IP 제한이 그 앞을 지킨다.</p>
       <h3>5.2 <code>receiveSTTMessage</code> 따라가기 (78~190줄)</h3>
-      <p>이 메서드 하나가 모듈의 설계 철학을 전부 보여준다. <strong>순서가 곧 설계다.</strong></p>
+      <p>이 메서드 하나에 모듈의 설계가 다 들어 있다. 순서가 곧 설계다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>① 빈 텍스트면 200 OK 로 조용히 무시          (연동 시스템이 빈 발화를 보낸다)
-② sttIngestFilter.shouldDiscardMessage()      노이즈·중복 통화 차단 → 6절
+② sttIngestFilter.shouldDiscardMessage()      노이즈·중복 통화 차단 → 7절
 ③ persistWithSingleRetry()                    DB 저장. 실패 시 1회 재시도, 그래도 실패면 503
       └ 저장 실패하면 ④⑤ 를 하지 않는다  ← "화면엔 보이는데 DB 엔 없는 발화" 방지
 ④ 재전송(duplicateSourceEvent)이면 여기서 끝   실시간 전송 반복 안 함
@@ -237,15 +222,14 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
 ⑥ finally: recordMessageLineage()             계보 기록. 실패해도 예외 안 던짐
 ⑦ 처리 시간이 임계 넘으면 WARN 로그            filterMs / saveMs / scanRouteMs 분리 측정</pre>
       </div>
-      <h3>읽으면서 확인할 것 3가지</h3>
-      <ol><li><strong>왜 저장이 실시간 전송보다 먼저인가?</strong> — 주석: "원문 저장 성공 후에만 실시간/후속 라우팅으로 전파한다."</li><li><strong>왜 lineage 는 <code>finally</code> 에 있고 예외를 삼키는가?</strong> — 계보 기록 장애가 이미 저장된 발화의 실시간 전달을 막으면 안 되기 때문(STT-017 결정).</li><li><strong>2026-09-23 주석</strong> — 수신 경로에서 LLM 교정 호출을 제거했다. 이유: HTTP 스레드에서 LLM 을 동기 실행하는 잠재 결함. <strong>"수신 경로는 LLM 대기로 블록되지 않아야 한다"</strong> 는 이 모듈의 원칙이다.</li></ol>
+      <p>읽으면서 세 가지를 확인한다. 왜 저장이 실시간 전송보다 먼저인가. 주석은 "원문 저장 성공 후에만 실시간/후속 라우팅으로 전파한다"고 답한다. 화면에는 떴는데 DB 에는 없는 발화를 만들지 않겠다는 뜻이다. 왜 계보 기록은 <code>finally</code> 안에 있고 예외를 삼키는가. 계보 기록이 고장 났다고 이미 저장된 발화의 실시간 전달까지 막으면 안 되기 때문이다(STT-017 결정). 그리고 2026-09-23 자 주석. 누군가 이 수신 경로에서 LLM 교정 호출을 떼어 냈다. 결과가 로그에만 남는 호출이었는데 HTTP 스레드에서 LLM 을 동기로 기다리는 구조였다. 수신 경로는 LLM 을 기다리지 않는다는 것이 이 모듈의 원칙으로 남았다.</p>
       <h3>5.3 <code>receiveSTTEvent</code> (190~325줄) — 훑기만</h3>
-      <p>구조는 message 와 같다 (필터 → 저장 → 라우팅 → lineage). 다른 점 하나:</p>
-      <div class="note">
+      <p>구조는 message 와 같다. 필터, 저장, 라우팅, 계보. 다른 점은 하나다.</p>
+      <div class="note is-key">
         <p class="note-title">END(<code>E</code>) 저장이 끝나면 <code>SttCallCompletedEvent</code> 를 발행한다.</p>
-        <p>이게 다른 모듈로 가는 유일한 출구다 (7절).</p>
+        <p>이것이 다른 모듈로 나가는 유일한 출구다. 8절에서 누가 받는지 본다.</p>
       </div>
-      <p>키 있는 수신(STT-010)의 "선점·503·재전송" 분기가 절반을 차지하는데, 1단계에서는 <strong><code>sourceEventId == null</code> 인 레거시 분기(231~245줄)만</strong> 읽으면 된다. 로컬 데이터가 전부 그 경로다.</p>
+      <p>키 있는 수신(STT-010)의 선점·503·재전송 분기가 메서드의 절반을 차지하는데, 1단계에서는 <code>sourceEventId == null</code> 인 레거시 분기(231~245줄)만 읽으면 된다. 로컬 데이터가 전부 그 길로 들어왔다.</p>
       <h3>5.4 나머지 엔드포인트 — 목록만</h3>
       <div class="table-wrap">
         <table>
@@ -259,11 +243,11 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
           </tbody>
         </table>
       </div>
-      <p>React 쪽 진입점: <code>web-react/src/services/stt.service.ts</code> → <code>pages/SttConversationListPage.tsx</code> · <code>pages/SttRealtimePage.tsx</code>. (실시간 WebSocket 은 <code>services/stt-realtime.service.ts</code>.)</p>
+      <p>React 쪽 진입점은 <code>web-react/src/services/stt.service.ts</code> 이고, 그걸 쓰는 화면이 <code>pages/SttConversationListPage.tsx</code> 와 <code>pages/SttRealtimePage.tsx</code> 다. 실시간 WebSocket 은 <code>services/stt-realtime.service.ts</code> 가 맡는다.</p>
     </section>
     <section id="s6">
       <h2><span class="num">06</span><span>service — <code>saveSTTMessage</code> 하나만 추적 (173~349줄)</span></h2>
-      <p class="lede">저장 메서드 하나와, 거기에 @Transactional 이 없는 이유.</p>
+      <p class="lede">저장 메서드 하나와, 거기서 애너테이션 한 줄이 떨어져 나간 날.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>① sourceEventId / sourceSystem 정규화         키 없으면 서버가 내부 ID 발급, system 은 'DEFAULT'
@@ -275,11 +259,12 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
 ④ messageRepository.save()                    DataIntegrityViolation 이면 unique 충돌 판정 → 409 재료
 ⑤ eventPublisher.publishEvent(SttChunkProcessedEvent)   실시간 상담보조(assist)·proactive 가 구독</pre>
       </div>
-      <h3>이 메서드에 <code>@Transactional</code> 이 <strong>없는</strong> 이유 (169줄 주석)</h3>
-      <div class="note">
-        <p>2026-05-28 fix: 30명 동시 INSERT 시 60초+ commit hold (HikariCP leak). 원인: 다중 secondary index + outer TX commit 단계의 lock 경쟁. 해결: repository 의 자체 짧은 TX 사용.</p>
+      <h3>이 메서드에 <code>@Transactional</code> 이 없는 이유</h3>
+      <p>169줄 주석에 날짜가 있다. 2026-05-28. 상담사 서른 명이 동시에 발화를 저장하는 상황에서 커밋이 60초 넘게 걸리고 HikariCP 커넥션이 새는 일이 있었다. 원인은 <code>STTMessage</code> 의 보조 인덱스 여러 개와 바깥 트랜잭션의 커밋 단계가 잠금을 두고 다툰 것이었고, 해결은 바깥 트랜잭션을 걷어 내고 repository 의 짧은 자체 트랜잭션에 맡기는 것이었다. 누군가 그날 애너테이션 한 줄을 뗐고 그 이유를 주석으로 남겼다.</p>
+      <div class="note is-warn">
+        <p class="note-title"><code>saveSTTMessage</code> 에 <code>@Transactional</code> 을 다시 붙이지 않는다.</p>
+        <p>CRITICAL 7 "모든 <code>@Transactional</code> 에 timeout" 과 8 "readOnly 안에서 외부 I/O 금지" 가 생긴 배경 중 하나가 이 사건이다. 규칙이 왜 있는지 궁금해지면 이 주석으로 돌아온다.</p>
       </div>
-      <p>이게 <strong>CLAUDE.md CRITICAL 7 "모든 <code>@Transactional</code> 에 timeout"</strong> 과 <strong>8 "readOnly 안에서 외부 I/O 금지"</strong> 가 생긴 배경 중 하나다. 규칙이 왜 있는지 궁금할 때 돌아올 곳.</p>
       <h3>같은 파일의 나머지는 언제 보나</h3>
       <div class="table-wrap">
         <table>
@@ -295,19 +280,19 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
     </section>
     <section id="s7">
       <h2><span class="num">07</span><span>ingest — <code>SttIngestFilter</code> (183줄, 전부 읽기)</span></h2>
-      <p class="lede">같은 내선으로 두 벌 들어오는 STT 중 무엇을 버리는가.</p>
-      <p><strong>왜 필요한가:</strong> AI 소프트폰을 쓰면 같은 상담사 내선(DN)으로 <strong>STT 가 두 벌</strong> 들어온다.</p>
+      <p class="lede">같은 강으로 두 줄기 물이 들어올 때 무엇을 버리는가.</p>
+      <p>AI 소프트폰을 쓰면 같은 상담사 내선으로 STT 가 두 벌 들어온다. 같은 강으로 물이 두 줄기 흘러드는데 한 줄기는 맑고 한 줄기는 흙탕이다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>출처</th><th><code>call_id</code> 모양</th><th>품질</th><th>처리</th></tr></thead>
           <tbody>
-            <tr><td><code>BRIDGE</code> (AI 소프트폰)</td><td>순수 UUID <code>c1de5af6-…</code></td><td>정제됨, 고객 발화만</td><td><strong>신뢰</strong></td></tr>
-            <tr><td><code>ACS_NATIVE</code> (레거시 교환기)</td><td><code>&lt;UUID&gt;_&lt;채널&gt;_&lt;DN&gt;</code></td><td>"감사합니다/요/지" 노이즈, 종료 후 유입</td><td>Bridge 활성 DN 이면 <strong>차단</strong></td></tr>
+            <tr><td><code>BRIDGE</code> (AI 소프트폰)</td><td>순수 UUID <code>c1de5af6-…</code></td><td>정제됨, 고객 발화만</td><td>신뢰</td></tr>
+            <tr><td><code>ACS_NATIVE</code> (레거시 교환기)</td><td><code>&lt;UUID&gt;_&lt;채널&gt;_&lt;DN&gt;</code></td><td>"감사합니다/요/지" 노이즈, 종료 후 유입</td><td>Bridge 활성 DN 이면 차단</td></tr>
             <tr><td class="scope-name"><code>UNKNOWN</code></td><td><code>SIM_…</code>, <code>CALL2026…</code> 등</td><td>—</td><td>차단 안 함</td></tr>
           </tbody>
         </table>
       </div>
-      <p>차단 사유 5가지가 메트릭 <code>stt.ingest.discarded{reason=…}</code> 로 남는다.</p>
+      <p>차단 사유 다섯 가지가 메트릭 <code>stt.ingest.discarded{reason=…}</code> 로 남는다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>reason</th><th>조건</th></tr></thead>
@@ -316,17 +301,16 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
             <tr><td class="scope-name"><code>native_carryover</code></td><td class="wrap">이미 차단된 native 통화의 나머지 발화·종료</td></tr>
             <tr><td class="scope-name"><code>post_call_end</code></td><td>END 이후 들어온 늦은 발화</td></tr>
             <tr><td class="scope-name"><code>filler_token</code></td><td class="wrap"><code>요,지,음,어,아,그,네에,음음</code> 1음절 단독 발화</td></tr>
-            <tr><td class="scope-name"><code>echo_phrase</code></td><td class="wrap">고객(RX) 채널 TTS 에코 — <strong>기본 비활성</strong> (정상 발화 손실 위험)</td></tr>
+            <tr><td class="scope-name"><code>echo_phrase</code></td><td class="wrap">고객(RX) 채널 TTS 에코 — 기본 비활성 (정상 발화 손실 위험)</td></tr>
           </tbody>
         </table>
       </div>
-      <p>설정은 <code>application.yml</code> 의 <code>stt.ai-softphone.*</code> · <code>stt.noise-filter.*</code> (206~218줄).</p>
-      <p><strong>읽으면서 볼 포인트:</strong> <code>processEventAndShouldDiscard()</code> 에서 <strong>native END 를 차단하면 <code>SttCallCompletedEvent</code> 도 안 나간다</strong> → 요약·워크플로우가 돌지 않는다. "AI 소프트폰 통화인데 요약이 안 떴다"는 문의가 오면 이 메트릭부터 본다.</p>
+      <p>설정은 <code>application.yml</code> 의 <code>stt.ai-softphone.*</code> 과 <code>stt.noise-filter.*</code> (206~218줄)에 있다. 읽으면서 볼 포인트는 <code>processEventAndShouldDiscard()</code> 다. native 의 END 를 차단하면 <code>SttCallCompletedEvent</code> 도 나가지 않고, 그러면 요약과 워크플로우가 돌지 않는다. "AI 소프트폰 통화인데 요약이 안 떴다"는 문의가 오면 이 메트릭부터 본다.</p>
     </section>
     <section id="s8">
       <h2><span class="num">08</span><span>이 모듈이 밖으로 내보내는 것 — 다음 단계로 가는 다리</span></h2>
-      <p class="lede">Spring 이벤트 2개가 다음 모듈로 가는 다리다.</p>
-      <p>stt 는 다른 모듈을 직접 호출하지 않는다(라우팅 서비스 제외). <strong>Spring 이벤트 2개</strong>로만 말한다.</p>
+      <p class="lede">이벤트 둘이 다음 모듈로 건너가는 다리다.</p>
+      <p>stt 는 라우팅 서비스를 빼면 다른 모듈을 직접 부르지 않는다. Spring 이벤트 두 개로만 말한다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>이벤트</th><th>발행 시점</th><th>구독자 (다른 모듈)</th></tr></thead>
@@ -336,11 +320,11 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
           </tbody>
         </table>
       </div>
-      <div class="note">
+      <div class="note is-warn">
         <p class="note-title">평가(<code>evaluation</code>)는 이 이벤트로 시작하지 않는다.</p>
-        <p>평가 대상은 <code>EvaluationTargetCollectScheduler</code> 가 10분마다 <code>stt_messages</code> 를 <strong>긁어서</strong> 모은다. 01 가이드 7절 "스케줄러가 6개다"가 이 얘기다. 2단계에서 확인한다.</p>
+        <p>평가 대상은 <code>EvaluationTargetCollectScheduler</code> 가 10분마다 <code>stt_messages</code> 를 긁어 모은다. 학습 가이드 7절의 "스케줄러가 여섯이다"가 이 얘기다. 2단계에서 직접 확인한다.</p>
       </div>
-      <p>구독자 중 조건이 붙은 것이 있다: <code>@EventListener(condition = "!@sttAssistQueueProperties.enabled")</code>. <code>stt.assist-queue.enabled</code> 가 true 면 리스너 대신 <strong>영속 대기열</strong>이 처리한다(기본 false). 지금은 "두 경로가 있고 설정으로 고른다"만 기억.</p>
+      <p>구독자 가운데 조건이 붙은 것이 있다. <code>@EventListener(condition = "!@sttAssistQueueProperties.enabled")</code>. <code>stt.assist-queue.enabled</code> 가 참이면 리스너 대신 영속 대기열이 처리한다(기본 거짓). 지금은 두 길이 있고 설정으로 고른다는 것까지만 기억한다.</p>
       <h3>실시간 전송 경로</h3>
       <div class="code">
         <div class="code-head">도식</div>
@@ -350,40 +334,40 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
                             /topic/stt/message/{extensionNumber}
                             /topic/stt/event/{extensionNumber}</pre>
       </div>
-      <p>로컬은 Kafka OFF 라 WebSocket 직행이다. React 실시간 화면은 자기 내선 토픽을 구독한다.</p>
+      <p>로컬은 Kafka 가 꺼져 있어 WebSocket 으로 바로 간다. React 실시간 화면은 자기 내선의 토픽을 구독한다.</p>
     </section>
     <section id="s9">
       <h2><span class="num">09</span><span>보너스 — <code>counseltype</code> (35개)</span></h2>
       <p class="lede">AI 호출이 붙으면 모듈이 어떻게 달라지나. 15분.</p>
-      <p><strong>"AI 호출이 붙으면 모듈이 어떻게 달라지나"</strong> 를 보는 2번째 표본. 15분이면 된다.</p>
-      <ul><li>테이블 <code>counsel_type</code> — 로컬 92행, 트리(<code>parent_id</code> · <code>depth</code> · <code>path = STD-1 …</code>)</li><li>일반 CRUD 위에 <strong><code>reclassify</code></strong>(AI 재분류 실행) · <code>merge</code> · <code>similarity-groups</code>(유사 이름 묶기) 가 얹혀 있다</li><li>그래서 <code>service/impl/</code> 에 <code>CounselTypeRaceSafeWriter</code> · <code>StandardCatalogResolver</code> · <code>ReclassificationRunServiceImpl</code> 처럼 <strong>실행 이력·동시성 방어</strong>가 추가로 생긴다</li><li>인가는 클래스 레벨 <code>@PreAuthorize("isAuthenticated()")</code> 하나 — 02 가이드 "role 하드코딩 금지"(CRITICAL 19) 의 모범 사례</li></ul>
-      <p>stt 와 비교해서 볼 것: <strong>"쓰기 한 번"이 아니라 "실행(run) 한 번"</strong> 이 단위가 되면 <code>*Run</code> 엔티티와 상태 컬럼이 생긴다. 2단계 <code>evaluation_execution</code> 이 똑같은 모양이다.</p>
+      <p>"AI 호출이 붙으면 모듈이 어떻게 달라지나"를 보는 두 번째 표본이다. 15분이면 된다.</p>
+      <p>테이블 <code>counsel_type</code> 은 로컬에 92행이 있고 <code>parent_id</code>, <code>depth</code>, <code>path = STD-1 …</code> 로 트리를 이룬다. 일반 CRUD 위에 <code>reclassify</code>(AI 재분류 실행)와 <code>merge</code> 와 <code>similarity-groups</code>(유사 이름 묶기)가 얹혀 있고, 그래서 <code>service/impl/</code> 에 <code>CounselTypeRaceSafeWriter</code> 와 <code>StandardCatalogResolver</code> 와 <code>ReclassificationRunServiceImpl</code> 같은 실행 이력·동시성 방어가 추가로 생겼다. 인가는 클래스 레벨 <code>@PreAuthorize("isAuthenticated()")</code> 하나뿐인데, 이것이 "role 하드코딩 금지"(CRITICAL 19)의 모범 사례다.</p>
+      <p>stt 와 견주어 볼 것은 단위의 변화다. "쓰기 한 번"이 아니라 "실행 한 번"이 단위가 되는 순간 <code>*Run</code> 엔티티와 상태 컬럼이 생긴다. 2단계의 <code>evaluation_execution</code> 이 똑같은 모양으로 기다리고 있다.</p>
     </section>
     <section id="s10">
       <h2><span class="num">10</span><span>함정 모음</span></h2>
-      <p class="lede">9가지.</p>
+      <p class="lede">아홉 가지.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>#</th><th>함정</th><th>대응</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td><code>channel_type</code> 으로 화자 판정</td><td class="wrap"><strong>금지.</strong> <code>SttSpeakerUtils.isAgent()</code> 만 사용</td></tr>
+            <tr><td>1</td><td><code>channel_type</code> 으로 화자 판정</td><td class="wrap">금지. <code>SttSpeakerUtils.isAgent()</code> 만 사용</td></tr>
             <tr><td>2</td><td class="wrap"><code>stt_events</code> ↔ <code>stt_messages</code> FK 없음</td><td class="wrap">발화만 있는 통화·이벤트만 있는 통화가 둘 다 존재한다. JOIN 시 LEFT 로</td></tr>
             <tr><td>3</td><td class="wrap"><code>text</code> 는 <code>updatable = false</code></td><td class="wrap">원문 수정 요구는 <code>corrected_text</code> + revision 으로</td></tr>
             <tr><td>4</td><td>수신 경로에서 LLM·외부 호출</td><td class="wrap">2026-09-23 제거 사례. 수신은 저장+전송만</td></tr>
             <tr><td>5</td><td class="wrap"><code>saveSTTMessage</code> 에 <code>@Transactional</code> 추가</td><td>2026-05-28 사고 재발. 추가하지 말 것</td></tr>
             <tr><td>6</td><td class="wrap">native END 차단 → 요약·워크플로우 미실행</td><td class="wrap">메트릭 <code>stt.ingest.discarded</code> 확인</td></tr>
             <tr><td>7</td><td>로컬 Kafka OFF / dev ON</td><td>실시간이 안 뜨면 프로파일부터 확인</td></tr>
-            <tr><td>8</td><td class="wrap"><code>start_time</code> 은 epoch <strong>ms</strong> 로 받는다</td><td class="wrap">초 단위로 보내면 1970년이 된다 (<code>epochMillisToLdt</code> 에 2000년 임계값 방어 있음)</td></tr>
-            <tr><td>9</td><td>테넌트 ID 는 헤더 <code>X-Tenant-Id</code></td><td class="wrap"><code>channel_type</code> 에 넣는 옛 방식과 혼동 금지</td></tr>
+            <tr><td>8</td><td class="wrap"><code>start_time</code> 은 epoch ms 로 받는다</td><td class="wrap">초 단위로 보내면 1970년이 된다 (<code>epochMillisToLdt</code> 에 2000년 임계값 방어 있음)</td></tr>
+            <tr><td>9</td><td>테넌트 ID 는 HTTP 헤더로 받는다</td><td class="wrap"><code>channel_type</code> 에 넣던 옛 방식과 혼동 금지</td></tr>
           </tbody>
         </table>
       </div>
     </section>
     <section id="s11">
       <h2><span class="num">11</span><span>자가진단</span></h2>
-      <p class="lede">10문항. 8개 이상이면 2단계로.</p>
-      <ol><li>통화 1건은 <code>stt_events</code> 에 몇 행이 생기나? 각 행의 <code>type</code> 은?</li><li>발화의 화자는 어느 컬럼으로 판정하나? <code>IN</code>/<code>MIX</code> 는 무엇인가?</li><li><code>text</code> 와 <code>corrected_text</code> 는 뭐가 다른가? 교정 이력은 어디에 쌓이나?</li><li>발화 저장이 실패하면 실시간 화면 전송은 어떻게 되나? (5.2 ③)</li><li><code>POST /api/stt/message</code> 가 permitAll 인데 왜 괜찮은가?</li><li>통화가 끝났다는 사실을 <code>assist</code> 모듈은 어떻게 알게 되나?</li><li>AI 소프트폰 통화에서 레거시 교환기 STT 가 같이 들어오면 어느 쪽을 버리나? 근거는 <code>call_id</code> 의 어떤 특징인가?</li><li>평가는 <code>SttCallCompletedEvent</code> 로 시작되나?</li><li><code>saveSTTMessage</code> 에 <code>@Transactional</code> 이 없는 이유는?</li><li><strong>위 6개 파일이 각각 어느 디렉토리에 있었는지, 안 보고 말할 수 있나?</strong> ← 진짜 목표</li></ol>
-      <p><strong>8개 이상 답하면 2단계로.</strong> 10번이 안 되면 01 가이드 2절 "표준 디렉토리 구조"를 한 번 더 보고 넘어간다.</p>
+      <p class="lede">열 문항. 여덟 이상이면 2단계로.</p>
+      <ol><li>통화 1건은 <code>stt_events</code> 에 몇 행이 생기나? 각 행의 <code>type</code> 은?</li><li>발화의 화자는 어느 컬럼으로 판정하나? <code>IN</code>/<code>MIX</code> 는 무엇인가?</li><li><code>text</code> 와 <code>corrected_text</code> 는 뭐가 다른가? 교정 이력은 어디에 쌓이나?</li><li>발화 저장이 실패하면 실시간 화면 전송은 어떻게 되나? (5.2 ③)</li><li><code>POST /api/stt/message</code> 가 permitAll 인데 왜 괜찮은가?</li><li>통화가 끝났다는 사실을 <code>assist</code> 모듈은 어떻게 알게 되나?</li><li>AI 소프트폰 통화에서 레거시 교환기 STT 가 같이 들어오면 어느 쪽을 버리나? 근거는 <code>call_id</code> 의 어떤 특징인가?</li><li>평가는 <code>SttCallCompletedEvent</code> 로 시작되나?</li><li><code>saveSTTMessage</code> 에 <code>@Transactional</code> 이 없는 이유는?</li><li>위 여섯 파일이 각각 어느 디렉토리에 있었는지, 안 보고 말할 수 있나?</li></ol>
+      <p>여덟 개 이상이면 2단계로 간다. 10번이 안 되면 학습 가이드 2절의 디렉토리 구조를 한 번 더 보고 넘어간다. 그게 이 단계의 진짜 목표였다.</p>
     </section>
     <section id="s12">
       <h2><span class="num">12</span><span>파일 위치 요약</span></h2>
@@ -403,7 +387,6 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
             <tr><td>통화 종료 이벤트</td><td class="wrap"><code>stt/event/SttCallCompletedEvent.java</code></td></tr>
             <tr><td>수신 보안 규칙</td><td class="wrap"><code>core/config/LocalSecurityConfig.java</code> 174~190줄</td></tr>
             <tr><td>설정</td><td class="wrap"><code>application.yml</code> 138~218줄 (<code>stt:</code> 블록)</td></tr>
-            <tr><td>외부 연동 명세</td><td class="wrap"><code>claudedocs/12_reference/STT_INGESTION_INTERFACE.md</code></td></tr>
             <tr><td>React 서비스</td><td class="wrap"><code>web-react/src/services/stt.service.ts</code> · <code>stt-realtime.service.ts</code></td></tr>
             <tr><td>React 화면</td><td class="wrap"><code>web-react/src/pages/SttConversationListPage.tsx</code> · <code>SttRealtimePage.tsx</code></td></tr>
             <tr><td>보너스 모듈</td><td class="wrap"><code>counseltype/</code> (엔티티 <code>CounselType</code> → 테이블 <code>counsel_type</code>)</td></tr>
@@ -417,11 +400,11 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
     <div class="closing">
       <h2><span class="num">■</span><span>기억할 것</span></h2>
       <ol>
-        <li><strong>stt 는 입구다.</strong> 저장하고 전송할 뿐, 분석·평가·요약은 다른 모듈이 이벤트를 받아서 한다.</li>
-        <li><strong>화자는 call_type 이고, 유틸을 통해서만 판정한다.</strong> channel_type 은 세 가지 의미가 섞인 폐기 컬럼이다.</li>
-        <li><strong>저장 성공 후에만 실시간 전송.</strong> 화면엔 보이는데 DB 엔 없는 발화를 만들지 않는다.</li>
-        <li><strong>출구는 Spring 이벤트 2개.</strong> 평가는 이 이벤트로 시작하지 않고 스케줄러가 긁어간다.</li>
-        <li><strong>수신 경로에서 LLM 을 기다리지 않는다.</strong> 2026-09-23 에 제거된 동기 교정 호출이 그 사례다.</li>
+        <li><strong>stt 는 강어귀다.</strong> 받아 두고 흘려보낼 뿐, 분석·평가·요약은 다른 모듈이 이벤트를 받아서 한다.</li>
+        <li><strong>화자는 call_type 이고, 유틸을 거쳐서만 판정한다.</strong> channel_type 은 세 가지 뜻이 겹쳐 쌓인 폐기 컬럼이다.</li>
+        <li><strong>저장이 먼저, 전송은 그다음.</strong> 화면에는 떴는데 DB 에는 없는 발화를 만들지 않는다.</li>
+        <li><strong>출구는 Spring 이벤트 둘.</strong> 평가는 이 이벤트로 시작하지 않고 스케줄러가 긁어 간다.</li>
+        <li><strong>수신 경로는 LLM 을 기다리지 않는다.</strong> 2026-09-23 에 떨어져 나간 동기 교정 호출이 그 사례다.</li>
       </ol>
     </div>
 
