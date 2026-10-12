@@ -9,6 +9,9 @@ https://stay-stranger.github.io
 ```
 index.html                 홈 — 카테고리별 글 목록
 assets/css/site.css        홈 공용 스타일
+assets/css/post.css        글 공용 스타일
+advisor/                   어드바이저 — 코드베이스 학습 기록 (index.html 이 시리즈 목차)
+ops-log/                   운영기록 카테고리
 error-handling/            오류처리 카테고리
   two-oracle-drivers.html  두 개의 OracleDriver (ORA-28040)
 .nojekyll                  Jekyll 빌드 없이 정적 파일 그대로 서빙

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="모듈 57개짜리 Spring Boot + React 저장소를 모듈 단위로 읽어 나가는 학습 기록의 목차. 7단계 학습 경로와 각 단계의 글.">
+<title>어드바이저 코드 읽기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/post.css">
+</head>
+<body>
+<nav class="sitenav"><a href="/">← stay-stranger</a></nav>
+
+<div class="shell">
+
+  <nav class="toc" aria-label="목차">
+    <p class="toc-label">목차</p>
+    <ol>
+      <li><a href="#s1">읽는 방법</a></li>
+      <li><a href="#s2">학습 경로 7단계</a></li>
+      <li><a href="#s3">발행된 글</a></li>
+      <li><a href="#s4">공통 루틴</a></li>
+    </ol>
+  </nav>
+
+  <main class="doc">
+
+    <p class="eyebrow">코드베이스 학습 · 시리즈 목차</p>
+    <h1>어드바이저 코드 읽기</h1>
+    <p class="standfirst">
+      Java 파일 7,814개, 백엔드 모듈 61개, React 컴포넌트 1,642개짜리 저장소를
+      처음부터 끝까지 이해하는 건 불가능하다. 그래서 목표를 바꿨다.
+      <strong>필요한 부분에 빠르게 도달하는 능력</strong>을 기르는 순서로 모듈을 하나씩 읽고,
+      읽은 만큼 글로 남긴다. 이 페이지가 그 목차다.
+    </p>
+
+    <div class="meta-strip">
+      <span><b>대상</b> 실시간 STT 기반 상담 모니터링·평가 플랫폼 (Spring Boot 3.4 / Java 21 / React 19)</span>
+      <span><b>진행</b> 0단계 완료 · 1단계 진행 중</span>
+      <span><b>수치</b> 2026.10.12 전수 재측정 (커밋 f06317ca47)</span>
+    </div>
+
+    <section id="s1">
+      <h2><span class="num">01</span><span>읽는 방법</span></h2>
+      <p class="lede">위에서부터 순서대로. 건너뛰면 뒤에서 막힌다.</p>
+
+      <p>
+        각 글은 모듈 하나를 같은 틀로 다룬다. 이 모듈이 하는 일 한 문장, 읽을 파일과 줄 범위,
+        실제 DB 데이터를 보는 쿼리, 메서드 하나를 끝까지 따라가는 추적, 함정 모음, 자가진단 순이다.
+        글 끝의 자가진단을 통과하면 다음 글로 넘어간다.
+      </p>
+
+      <div class="note is-key">
+        <p class="note-title">이 시리즈의 전제</p>
+        <p>
+          0~2단계가 전체 Java 파일의 약 9%(671 / 7,814)인데, 실무의 대부분이 이 9%에서 나온다.
+          나머지는 필요해질 때 모듈 지도를 보고 찾아가면 된다.
+        </p>
+      </div>
+    </section>
+
+    <section id="s2">
+      <h2><span class="num">02</span><span>학습 경로 7단계</span></h2>
+      <p class="lede">가장 크고 활발한 모듈에서 시작하면 반드시 지친다. 작은 것부터.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>단계</th><th>모듈</th><th>파일 수</th><th class="wrap">목표</th><th>예상</th><th>글</th></tr></thead>
+          <tbody>
+            <tr><td class="scope-name">0</td><td><code>core</code> → <code>auth</code> → <code>permission</code></td><td>289</td><td class="wrap">인증·권한·응답 규격</td><td>2~3일</td><td class="yes"><a href="/advisor/study-guide.html">가이드</a> · <a href="/advisor/auth-permission-menu.html">권한</a></td></tr>
+            <tr class="row-hi"><td class="scope-name">1</td><td><code>stt</code> (+ <code>counseltype</code>)</td><td>65 (+35)</td><td class="wrap"><strong>모듈 구조 패턴 체득</strong></td><td>1~2일</td><td class="yes"><a href="/advisor/stt-module.html">stt 모듈</a></td></tr>
+            <tr><td class="scope-name">2</td><td><code>evaluation</code></td><td>282</td><td class="wrap">핵심 업무 도메인</td><td>1주</td><td class="no">예정</td></tr>
+            <tr><td class="scope-name">3</td><td><code>recording</code> → <code>sttanalytics</code></td><td>265</td><td class="wrap">데이터 인입·분석</td><td>1주</td><td class="no">예정</td></tr>
+            <tr><td class="scope-name">4</td><td><code>ai</code> (일부만)</td><td>1,227 중 3개 패키지</td><td class="wrap">AI 실행 기반</td><td>3일</td><td class="no">예정</td></tr>
+            <tr><td class="scope-name">5</td><td><code>rag</code> → <code>kms</code></td><td>1,048</td><td class="wrap">검색·지식</td><td>2주</td><td class="no">예정</td></tr>
+            <tr><td class="scope-name">6</td><td><code>orchestration</code> → <code>agi</code></td><td>1,228</td><td class="wrap">워크플로우·자율 에이전트</td><td>필요 시</td><td class="no">예정</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cap">파일 수는 2026-10-12 커밋 기준 Java 파일 실측. 7월 초판 대비 전체가 약 1.3배 늘어서 모든 단계 수치를 다시 쟀다.</p>
+
+      <div class="note is-warn">
+        <p class="note-title">6단계는 마지막까지 미룬다</p>
+        <p>가장 어렵고 가장 자주 바뀐다. 필요해지기 전에는 손대지 않는다.</p>
+      </div>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">03</span><span>발행된 글</span></h2>
+      <p class="lede">순서대로 읽는다.</p>
+
+      <div class="order">
+        <div class="order-row is-win"><span class="order-idx">1</span><span class="order-name"><a href="/advisor/study-guide.html">어드바이저 코드베이스 학습 가이드</a> <span class="order-tag">시작점</span></span></div>
+        <div class="order-row is-win"><span class="order-idx">2</span><span class="order-name"><a href="/advisor/auth-permission-menu.html">인증 · 권한 · 메뉴 체계</a> <span class="order-tag">0단계</span></span></div>
+        <div class="order-row is-win"><span class="order-idx">3</span><span class="order-name"><a href="/advisor/stt-module.html">stt 모듈 — 모듈 구조 패턴 체득</a> <span class="order-tag">1단계</span></span></div>
+        <div class="order-row is-lose"><span class="order-idx">4</span><span class="order-name">evaluation 모듈 — 핵심 업무 도메인 (예정)</span></div>
+      </div>
+      <p class="cap">1번 글이 전체 경로와 0단계 세 모듈을 다루고, 2번이 그중 권한 체계를 깊게 판다. 3번부터 모듈 하나에 글 하나다.</p>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">04</span><span>공통 루틴</span></h2>
+      <p class="lede">모듈이 57개지만 전부 같은 구조라, 접근법도 하나면 된다.</p>
+
+      <div class="code">
+        <div class="code-head">모듈 하나를 읽는 5단계</div>
+<pre>1) 모듈 지도에서 한 줄 설명 확인
+2) entity/        이 도메인이 다루는 <span class="c-acc">"명사"</span>가 무엇인지
+3) DB SELECT      그 테이블 실제 데이터 10건을 눈으로 확인   <span class="c-tar">← 가장 중요</span>
+4) controller/    밖에서 무엇을 요청할 수 있는지 (<span class="c-acc">"동사"</span>)
+5) service/impl/  관심 있는 메서드 <span class="c-acc">하나만</span> 끝까지 추적</pre>
+      </div>
+
+      <div class="code">
+        <div class="code-head">모든 모듈이 따르는 디렉토리 구조</div>
+<pre>{module}/
+  controller/   REST 진입점       @RestController
+  service/      인터페이스        IXxxService
+  service/impl/ 구현체            XxxServiceImpl
+  repository/   DB 접근           JpaRepository
+  entity/       테이블 매핑       @Entity
+  dto/          요청·응답 객체
+  event/        도메인 이벤트
+  listener/     이벤트 수신
+  scheduler/    주기 실행</pre>
+      </div>
+
+      <div class="note">
+        <p class="note-title">3번을 건너뛰지 않는다</p>
+        <p>실제 데이터를 보면 코드가 갑자기 읽힌다. 코드만 보면 추상적이라 머리에 남지 않는다.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <div class="closing">
+      <h2><span class="num">■</span><span>기억할 것</span></h2>
+      <ol>
+        <li><strong>전부 이해하는 건 목표가 아니다.</strong> 필요한 부분에 빠르게 도달하는 능력이 목표다.</li>
+        <li><strong>작은 모듈부터.</strong> 큰 모듈에서 시작하면 패턴이 아니라 피로만 남는다.</li>
+        <li><strong>DB 를 먼저 본다.</strong> 명사(entity) → 실데이터 → 동사(controller) → 추적(service).</li>
+        <li><strong>글마다 자가진단이 있다.</strong> 통과하지 못했으면 다음 글로 넘어가지 않는다.</li>
+      </ol>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

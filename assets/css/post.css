@@ -158,6 +158,9 @@
   .toc a:hover,
   .toc a:focus-visible { color: var(--accent); border-left-color: var(--accent); }
 
+  /* 절 번호가 0 부터 시작하는 글(학습 가이드류). 목차 번호를 본문 .num 과 맞춘다. */
+  .toc ol.from-zero { counter-reset: toc -1; }
+
   /* ---------- 본문 ---------- */
   .doc { min-width: 0; max-width: 72ch; padding-top: 88px; }
 
@@ -517,4 +520,5 @@
   .sitenav { max-width: 1180px; margin: 0 auto; padding: 28px 24px 0; font-family: var(--mono); font-size: 12px; }
   .sitenav a { color: var(--ink-3); text-decoration: none; }
   .sitenav a:hover, .sitenav a:focus-visible { color: var(--accent); }
+  .sitenav-sep { color: var(--line); margin: 0 4px; }
   @media (min-width: 1000px) { .sitenav { padding: 28px 32px 0; } }

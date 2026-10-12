@@ -26,6 +26,82 @@
 
   <section class="category">
     <div class="category-head">
+      <h2>어드바이저</h2>
+      <span class="category-count">4편</span>
+    </div>
+    <p class="category-note">
+      모듈 61개짜리 저장소를 모듈 단위로 읽어 나가는 학습 기록. 목차부터 순서대로.
+    </p>
+
+    <div class="posts">
+      <a class="post" href="/advisor/">
+        <div class="post-meta">
+          <span class="post-date">2026.10.12</span>
+          <span class="tag">시리즈</span>
+          <span class="tag">학습 경로</span>
+        </div>
+        <h3>어드바이저 코드 읽기 — 목차</h3>
+        <p>
+          Java 파일 7,814개, 모듈 61개를 전부 이해하는 건 불가능하다. 전체의 9%에서
+          시작해 실무의 대부분에 먼저 도달하는 7단계 경로와, 모듈 하나를 읽는 공통 루틴,
+          그리고 지금까지 발행된 글의 순서.
+        </p>
+        <span class="post-error">0단계 완료 · 1단계 진행 중</span>
+      </a>
+
+      <a class="post" href="/advisor/study-guide.html">
+        <div class="post-meta">
+          <span class="post-date">2026.10.12</span>
+          <span class="tag">Spring Boot</span>
+          <span class="tag">코드 읽기</span>
+          <span class="tag">온보딩</span>
+        </div>
+        <h3>어드바이저 코드베이스 학습 가이드</h3>
+        <p>
+          처음 저장소를 받아 든 개발자를 위한 읽기 순서. 0단계 세 모듈(core · auth ·
+          permission)에서 실제로 볼 파일 6개, 모듈마다 같은 5단계 루틴, 모르고 밟으면
+          장애로 이어지는 규칙, 그리고 단계별 자가진단.
+        </p>
+        <span class="post-error">모듈 61개 · 7단계 · 2026.10 재측정</span>
+      </a>
+
+      <a class="post" href="/advisor/auth-permission-menu.html">
+        <div class="post-meta">
+          <span class="post-date">2026.10.12</span>
+          <span class="tag">Spring Security</span>
+          <span class="tag">JWT</span>
+          <span class="tag">RBAC</span>
+        </div>
+        <h3>인증 · 권한 · 메뉴 체계</h3>
+        <p>
+          요청 하나가 지나는 관문 세 개. JWT 필터는 신원을 채우기만 하고 차단은 URL
+          매트릭스가 하며, "본인 것만"은 어떤 애너테이션도 표현하지 못해 서비스 코드가
+          맡는다. 역할 하드코딩 467건이 1건으로 줄고 메뉴 SSOT가 BE로 넘어간 뒤의
+          구조를 다시 쟀다.
+        </p>
+        <span class="post-error">401 vs 403 · hasRole 467 → 1</span>
+      </a>
+
+      <a class="post" href="/advisor/stt-module.html">
+        <div class="post-meta">
+          <span class="post-date">2026.10.12</span>
+          <span class="tag">Spring Boot</span>
+          <span class="tag">도메인 이벤트</span>
+          <span class="tag">MariaDB</span>
+        </div>
+        <h3>stt 모듈 — 모듈 구조 패턴 체득</h3>
+        <p>
+          가장 작은 업무 모듈 하나로 모듈 읽는 법을 익힌다. 통화 이벤트와 발화를 받아
+          저장하고 실시간으로 뿌리는 입구 모듈을, 파일 6개와 메서드 2개만 끝까지
+          따라가며 읽는다. 화자 판정 컬럼의 함정과 저장 메서드에 트랜잭션이 없는 이유.
+        </p>
+        <span class="post-error">파일 6개 · 메서드 2개</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="category">
+    <div class="category-head">
       <h2>운영기록</h2>
       <span class="category-count">1편</span>
     </div>
