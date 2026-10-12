@@ -132,16 +132,17 @@
     counter-reset: toc;
   }
 
+  /* 번호는 절대배치. grid 로 두면 제목 안의 <code> 같은 인라인 요소가
+     별도 grid 아이템이 되어 22px 번호 칸으로 밀려 들어간다. */
   .toc a {
-    display: grid;
-    grid-template-columns: 22px 1fr;
-    gap: 6px;
+    display: block;
+    position: relative;
     color: var(--ink-2);
     text-decoration: none;
     font-size: 13.5px;
     line-height: 1.45;
     border-left: 2px solid transparent;
-    padding-left: 10px;
+    padding-left: 38px;
     margin-left: -12px;
     transition: color .15s, border-color .15s;
   }
@@ -149,11 +150,16 @@
   .toc a::before {
     counter-increment: toc;
     content: counter(toc, decimal-leading-zero);
+    position: absolute;
+    left: 10px;
+    top: 2px;
+    width: 22px;
     font-family: var(--mono);
     font-size: 11px;
     color: var(--ink-3);
-    padding-top: 2px;
   }
+
+  .toc a code { word-break: normal; }
 
   .toc a:hover,
   .toc a:focus-visible { color: var(--accent); border-left-color: var(--accent); }
