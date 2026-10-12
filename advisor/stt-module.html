@@ -84,7 +84,7 @@
                                    assist(상담보조 세션 종료) · orchestration(워크플로우 트리거)
                                    addressbot · simulation  ← 다른 모듈이 구독</pre>
       </div>
-      <p>분석도 평가도 요약도 여기서는 하지 않는다. 강어귀는 물을 받아 두고 물길을 정할 뿐이고, 그 물에 무엇이 섞였는지 재는 일은 아래 물길의 몫이다. <code>sttanalytics</code>(3단계)와 <code>evaluation</code>(2단계)과 <code>assist</code> 가 이 모듈이 띄운 이벤트를 받아서 그 일을 한다.</p>
+      <p>분석도 평가도 요약도 여기서는 하지 않는다. 강어귀는 물을 받아 두고 물길을 정할 뿐이고, 그 물에 무엇이 섞였는지 재는 일은 아래 물길의 몫이다. <code>assist</code> 와 <code>orchestration</code> 이 이 모듈이 띄운 이벤트를 받아서 그 일을 하고, <code>evaluation</code>(2단계)은 이벤트 대신 스케줄러로 발화를 긁어 간다. <code>sttanalytics</code>(3단계)는 이 모듈과 선이 닿지 않는다. 바깥에서 가져온 파일을 따로 다룬다.</p>
     </section>
     <section id="s2">
       <h2><span class="num">02</span><span>읽는 순서 (6개 파일, 이 순서대로)</span></h2>

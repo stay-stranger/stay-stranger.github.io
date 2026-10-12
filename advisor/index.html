@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="모듈 61개짜리 Spring Boot + React 저장소를 모듈 하나씩 읽어 나가는 기록의 목차. 7단계 학습 경로와 지금까지 남긴 글 다섯.">
+<meta name="description" content="모듈 61개짜리 Spring Boot + React 저장소를 모듈 하나씩 읽어 나가는 기록의 목차. 7단계 학습 경로와 지금까지 남긴 글 여섯.">
 <title>어드바이저 코드 읽기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,7 +38,7 @@
 
     <div class="meta-strip">
       <span><b>대상</b> 실시간 STT 기반 상담 모니터링·평가 플랫폼 (Spring Boot 3.4 / Java 21 / React 19)</span>
-      <span><b>진행</b> 0단계 완료 · 1단계 진행 중 · 2단계 글 발행</span>
+      <span><b>진행</b> 0단계 완료 · 1단계 진행 중 · 2·3단계 글 발행</span>
       <span><b>수치</b> 2026.10.12 전수 재측정 (커밋 f06317ca47)</span>
     </div>
 
@@ -73,7 +73,7 @@
             <tr><td class="scope-name">0</td><td><code>core</code> → <code>auth</code> → <code>permission</code></td><td>289</td><td class="wrap">인증·권한·응답 규격</td><td>2~3일</td><td class="yes"><a href="/advisor/study-guide.html">가이드</a> · <a href="/advisor/auth-permission-menu.html">권한</a></td></tr>
             <tr class="row-hi"><td class="scope-name">1</td><td><code>stt</code> (+ <code>counseltype</code>)</td><td>65 (+35)</td><td class="wrap"><strong>모듈 구조 패턴 체득</strong></td><td>1~2일</td><td class="yes"><a href="/advisor/stt-module.html">stt 모듈</a></td></tr>
             <tr><td class="scope-name">2</td><td><code>evaluation</code></td><td>282</td><td class="wrap">핵심 업무 도메인</td><td>1주</td><td class="yes"><a href="/advisor/evaluation-module.html">evaluation 모듈</a></td></tr>
-            <tr><td class="scope-name">3</td><td><code>recording</code> → <code>sttanalytics</code></td><td>265</td><td class="wrap">데이터 인입·분석</td><td>1주</td><td class="no">예정</td></tr>
+            <tr><td class="scope-name">3</td><td><code>recording</code> → <code>sttanalytics</code></td><td>265</td><td class="wrap">데이터 인입·분석</td><td>1주</td><td class="yes"><a href="/advisor/recording-sttanalytics.html">recording · sttanalytics</a></td></tr>
             <tr><td class="scope-name">4</td><td><code>ai</code> (일부만)</td><td>1,227 중 3개 패키지</td><td class="wrap">AI 실행 기반</td><td>3일</td><td class="no">예정</td></tr>
             <tr><td class="scope-name">5</td><td><code>rag</code> → <code>kms</code></td><td>1,048</td><td class="wrap">검색·지식</td><td>2주</td><td class="no">예정</td></tr>
             <tr><td class="scope-name">6</td><td><code>orchestration</code> → <code>agi</code></td><td>1,228</td><td class="wrap">워크플로우·자율 에이전트</td><td>필요 시</td><td class="no">예정</td></tr>
@@ -97,7 +97,8 @@
         <div class="order-row is-win"><span class="order-idx">2</span><span class="order-name"><a href="/advisor/auth-permission-menu.html">인증 · 권한 · 메뉴 체계</a> <span class="order-tag">0단계</span></span></div>
         <div class="order-row is-win"><span class="order-idx">3</span><span class="order-name"><a href="/advisor/stt-module.html">stt 모듈 — 모듈 구조 패턴 체득</a> <span class="order-tag">1단계</span></span></div>
         <div class="order-row is-win"><span class="order-idx">4</span><span class="order-name"><a href="/advisor/evaluation-module.html">evaluation 모듈 — 핵심 업무 도메인</a> <span class="order-tag">2단계</span></span></div>
-        <div class="order-row is-lose"><span class="order-idx">5</span><span class="order-name">recording → sttanalytics — 데이터 인입·분석 (예정)</span></div>
+        <div class="order-row is-win"><span class="order-idx">5</span><span class="order-name"><a href="/advisor/recording-sttanalytics.html">recording · sttanalytics — 데이터 인입과 분석</a> <span class="order-tag">3단계</span></span></div>
+        <div class="order-row is-lose"><span class="order-idx">6</span><span class="order-name">ai — execution · prompt · routing (예정)</span></div>
       </div>
       <p class="cap">1번 글이 전체 경로와 0단계 세 모듈을 다루고, 2번이 그중 권한 체계를 깊게 판다. 3번부터는 모듈 하나에 글 하나씩이다.</p>
     </section>

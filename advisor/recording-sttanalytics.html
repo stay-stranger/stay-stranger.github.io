@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="통화가 바깥 DB 에서 들어오는 운하와, 파일 더미를 상담유형으로 분류하는 공장. 둘 다 강어귀를 거치지 않는다. 실행 이력 26,312줄에서 시작한다.">
+<title>recording · sttanalytics — 데이터 인입과 분석</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/post.css">
+</head>
+<body>
+<nav class="sitenav"><a href="/">← stay-stranger</a> <span class="sitenav-sep">/</span> <a href="/advisor/">어드바이저</a></nav>
+
+<div class="shell">
+
+  <nav class="toc" aria-label="목차">
+    <p class="toc-label">목차</p>
+    <ol class="from-zero">
+      <li><a href="#s0">이 단계의 목표</a></li>
+      <li><a href="#s1">두 모듈이 하는 일 (한 문장씩)</a></li>
+      <li><a href="#s2">읽는 순서 (8개 파일, 이 순서대로)</a></li>
+      <li><a href="#s3">entity — 두 모듈의 "명사"</a></li>
+      <li><a href="#s4">DB 실습 — 코드 전에 데이터부터</a></li>
+      <li><a href="#s5">recording — <code>pollSchedules</code> 에서 이벤트 발행까지</a></li>
+      <li><a href="#s6">sttanalytics — 지도만</a></li>
+      <li><a href="#s7">다음 단계로 가는 다리</a></li>
+      <li><a href="#s8">함정 모음</a></li>
+      <li><a href="#s9">자가진단</a></li>
+      <li><a href="#s10">파일 위치 요약</a></li>
+    </ol>
+  </nav>
+
+  <main class="doc">
+
+    <p class="eyebrow">모듈 읽기 · 3단계</p>
+    <h1>recording · sttanalytics — 데이터 인입과 분석</h1>
+    <p class="standfirst">
+      로컬 DB 의 녹취 수집 이력 테이블에 26,312줄이 있었다. 2분 cron 하나가 두 달 반을 혼자 돈 흔적이다. 이 단계는 바깥 DB 의 통화를 안으로 들여오는 <code>recording</code> 과, 들여온 파일 더미를 AI 로 분류하는 <code>sttanalytics</code> 를 한 글에 묶는다. 둘 다 <strong>1단계의 강어귀를 거치지 않는다.</strong> 2단계에서 남겨 둔 질문, <code>EXTERNAL_SYNC</code> 대상이 어디서 태어나는지도 여기서 답이 난다.
+    </p>
+
+    <div class="meta-strip">
+      <span><b>작성</b> 2026-10-12</span>
+      <span><b>기준 커밋</b> f06317ca47</span>
+      <span><b>실측</b> 로컬 DB · 데이터소스 9 · 스케줄 7 · 실행 이력 26,312</span>
+    </div>
+
+
+    <section id="s0">
+      <h2><span class="num">00</span><span>이 단계의 목표</span></h2>
+      <p class="lede">실행 이력 26,312줄과 2분 cron 에서 시작한다.</p>
+      <p>녹취 수집 실행 이력 테이블을 열었더니 26,312줄이 있었다. 로컬 DB 다. 누가 로컬에서 2만 번을 돌렸나 싶어 스케줄별로 세어 보니 1번 스케줄 혼자 15,453줄이었고, cron 이 <code>0 0/2 * * * ?</code> 였다. 1월 22일부터 4월 9일까지 2분마다 한 번씩, 켜 둔 노트북이 혼자 고객사 DB 흉내를 낸 테이블을 긁고 있었던 것이다. 8,315줄은 실패였고 22줄은 아직도 <code>RUNNING</code> 이다.</p>
+      <p>이 단계는 두 모듈을 한 글에 묶는다. <code>recording</code> 은 바깥 DB 와 파일 서버에서 통화를 안으로 들여오는 길이고, <code>sttanalytics</code> 는 들여온 텍스트 파일 더미를 AI 로 상담유형 분류하는 공장이다. 둘 다 1단계 stt 의 강어귀를 거치지 않는다. 그게 이 글에서 가장 먼저 고쳐 둘 그림이다. 2단계 <code>evaluation_target</code> 의 <code>source</code> 에 있던 <code>EXTERNAL_SYNC</code> 가 어디서 태어나는지도 여기서 답이 난다.</p>
+      <h3>7월 가이드 뒤에 바뀐 것</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>7월 27일</th><th>지금</th></tr></thead>
+          <tbody>
+            <tr><td><code>recording</code> Java 파일</td><td>112</td><td>112 (커밋 5개, 구조 그대로)</td></tr>
+            <tr><td><code>sttanalytics</code> Java 파일</td><td>138</td><td>153 (커밋 17개)</td></tr>
+            <tr><td>수집기 종류</td><td>7</td><td class="wrap">7 (<code>ORACLE</code> <code>MARIADB</code> <code>API</code> <code>FTP</code> <code>SFTP</code> <code>SCP</code> <code>LOCAL</code>)</td></tr>
+            <tr><td class="scope-name"><code>@Scheduled</code></td><td>—</td><td class="wrap"><code>recording</code> 1 · <code>sttanalytics</code> 1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><code>recording</code> 은 두 달 반 동안 거의 손을 타지 않았다. 7월 31일 외부 녹취 시스템 연동용 <code>public_id</code> 가 들어온 것과 8월 7일 화자 판정 컬럼 이관이 전부다. <code>sttanalytics</code> 는 10월 초에 원천 이벤트 멱등과 분류 투영 순서를 손봤다. 그래서 이 글은 <code>recording</code> 을 깊게, <code>sttanalytics</code> 는 지도만 그린다.</p>
+    </section>
+    <section id="s1">
+      <h2><span class="num">01</span><span>두 모듈이 하는 일 (한 문장씩)</span></h2>
+      <p class="lede">운하 하나와 공장 하나. 둘 다 강어귀 옆에 따로 있다.</p>
+      <p><code>recording</code> 은 고객사 DB 의 뷰 두 개(통화 목록과 문장 목록)를 주기적으로 읽어 우리 <code>stt_events</code> 와 <code>stt_messages</code> 에 직접 써 넣고, 평가 대상 뷰를 읽을 때는 <code>evaluation_target</code> 에 써 넣은 뒤 "다 넣었다"는 이벤트 하나를 띄운다.</p>
+      <p><code>sttanalytics</code> 는 외부 STT 시스템이 떨군 rx/tx 텍스트 파일을 폴더째 업로드 받아 통화 단위로 합치고, 작업 하나를 만들어 통화를 50건씩 묶어 AI 에 상담유형을 묻고, 결과를 MongoDB 와 포인터 테이블에 남겨 추이 통계를 낸다.</p>
+      <div class="code">
+        <div class="code-head">도식</div>
+<pre> [recording]
+ 고객사 Oracle/MariaDB ── 60초 폴링 ──▶ RecordingScheduler ──▶ CollectionEngine ──▶ 수집기 7종 중 하나
+      VW_RECORDINGINDEX + VW_RESULTSENTENCE ──(STT)──────────────▶ stt_events · stt_messages   ← 강어귀를 거치지 않는다
+      VW_INSPECTION_TARGET 류 ──────────────(EVALUATION_TARGET)──▶ evaluation_target (source=EXTERNAL_SYNC, PENDING)
+      끝나면 RecordingSyncCompletedEvent ──▶ evaluation 이 PENDING → DATA_READY 로 올린다
+
+ [sttanalytics]
+ rx/tx 텍스트 파일 더미 ──POST /folders/upload──▶ folder · call · utterance
+      ──POST /jobs──▶ job ──▶ chunk(50건) ──▶ 전략(SINGLE/GROUPED/EXTERNAL_BATCH) ──▶ classifyCall ──▶ 이벤트
+      ──▶ ClassificationStatisticsListener ──▶ MongoDB stt_classification_result + call_classification 포인터</pre>
+      </div>
+      <p>1단계에서 stt 를 강어귀라고 불렀다. 그 그림에 물길 하나를 더 그어야 한다. <code>recording</code> 은 강어귀 옆에 따로 판 운하다. 바깥 DB 의 물을 저수지(<code>stt_messages</code>)로 곧장 흘려 넣고, 강어귀의 필터도 실시간 방송도 종료 이벤트도 지나지 않는다. 그래서 운하로 들어온 통화는 화면에 실시간으로 뜨지 않았고, <code>SttCallCompletedEvent</code> 구독자들은 그 통화가 끝난 줄 모른다. <code>OracleSyncService.processChunk</code> (625줄) 가 <code>sttEventRepository.saveAll</code> 과 <code>sttMessageRepository.saveAll</code> 을 직접 부르는 자리가 그 운하의 입구다.</p>
+    </section>
+    <section id="s2">
+      <h2><span class="num">02</span><span>읽는 순서 (8개 파일, 이 순서대로)</span></h2>
+      <p class="lede">파일 여덟. 이천 줄짜리 하나는 메서드 둘만.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>파일</th><th>줄 수</th><th>읽는 법</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="wrap"><code>recording/entity/DataSource.java</code></td><td>416</td><td class="wrap">상단 컬럼과 enum 넷. 평가 2단계의 <code>EvaluationPlan</code> 만큼 설정이 많다</td></tr>
+            <tr><td>2</td><td class="wrap"><code>recording/entity/RecordingSchedule.java</code></td><td>112</td><td class="wrap">전부. 90~111줄 메서드 셋이 스케줄의 전부다</td></tr>
+            <tr><td>3</td><td>DB SELECT</td><td>—</td><td>4절 쿼리 넷</td></tr>
+            <tr><td>4</td><td class="wrap"><code>recording/scheduler/RecordingScheduler.java</code></td><td>388</td><td class="wrap">60~100줄 <code>pollSchedules</code> 와 117~199줄 <code>executeScheduleAsync</code>, 237~316줄 <code>completeExecution</code></td></tr>
+            <tr><td>5</td><td class="wrap"><code>recording/collector/CollectionEngineImpl.java</code></td><td>323</td><td class="wrap">37~137줄 <code>collect</code> 만. 수집기 선택이 여기서 난다</td></tr>
+            <tr><td>6</td><td class="wrap"><code>recording/service/OracleSyncService.java</code></td><td>2,086</td><td class="wrap">119~300줄 <code>syncFromOracle</code> 과 625~700줄 <code>processChunk</code> 만</td></tr>
+            <tr><td>7</td><td class="wrap"><code>recording/service/sync/EvaluationTargetSyncStrategy.java</code></td><td>520</td><td class="wrap">83~213줄 <code>processChunk</code> 와 260~298줄 <code>buildEvaluationTarget</code></td></tr>
+            <tr><td>8</td><td class="wrap"><code>sttanalytics/package-info.java</code> 와 <code>service/impl/SttAnalysisJobServiceImpl.java</code></td><td>18 · 1,308</td><td class="wrap">머리 주석 전부, 그다음 513~619줄 <code>runJob</code> 과 660~734줄 <code>processChunk</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>6번이 이천 줄이다. 겁먹지 말라는 말을 이제 세 번째 쓴다. 이 파일은 Oracle 과 MariaDB 를 같은 코드로 다루느라 길어진 것이지 흐름이 복잡해서 길어진 게 아니다. 메서드 둘만 따라가면 된다.</p>
+    </section>
+    <section id="s3">
+      <h2><span class="num">03</span><span>entity — 두 모듈의 "명사"</span></h2>
+      <p class="lede">recording 의 명사 셋과 sttanalytics 의 명사 셋. 비어 있는 테이블 셋은 왜 비었나.</p>
+      <h3>3.1 <code>recording</code> — 명사 셋</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>엔티티</th><th>테이블</th><th>한 줄</th><th>로컬 행 수</th></tr></thead>
+          <tbody>
+            <tr><td class="scope-name"><code>DataSource</code></td><td><code>recording_data_source</code></td><td class="wrap">어디서(호스트·뷰 이름) · 무엇을(STT 인지 평가 대상인지) · 어디까지 읽었나</td><td>9</td></tr>
+            <tr><td class="scope-name"><code>RecordingSchedule</code></td><td><code>recording_schedule</code></td><td class="wrap">그 데이터소스를 언제(cron) 읽나. <code>next_execution_time</code> 이 시계</td><td>7</td></tr>
+            <tr><td class="scope-name"><code>ExecutionHistory</code></td><td class="wrap"><code>recording_execution_history</code></td><td>한 번 읽은 기록. 건수와 소요 시간과 에러</td><td>26,312</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>나머지 셋은 비어 있다. <code>RecordingData</code> (<code>recording_data</code>) 는 파일 수집기용 메타 테이블인데 로컬에 0건이고, 수집기 일곱 중 어느 것도 이 테이블에 쓰지 않는다. <code>EvaluationQueue</code> 는 평가 계획이 생기기 전 녹취 수집 직후 평가를 걸던 대기열이고, 그 스케줄 둘은 주석 처리된 채 남아 있다. <code>StorageConfig</code> 는 파일 저장소 용량 설정이다. 셋 다 이번에는 건너뛴다.</p>
+      <p><code>DataSource</code> 의 enum 넷이 분기의 전부다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>컬럼</th><th>값</th><th>뜻</th></tr></thead>
+          <tbody>
+            <tr><td class="scope-name"><code>type</code></td><td class="wrap"><code>ORACLE</code> <code>MARIADB</code> <code>API</code> <code>FTP</code> <code>SFTP</code> <code>SCP</code> <code>LOCAL</code></td><td class="wrap">수집기 일곱 중 무엇을 쓰나. 앞의 둘은 DB→DB 동기화, 나머지는 파일</td></tr>
+            <tr><td class="scope-name"><code>sync_target_type</code></td><td class="wrap"><code>STT</code> / <code>EVALUATION_TARGET</code></td><td>통화 문장을 넣나, 평가 대상을 넣나</td></tr>
+            <tr><td class="scope-name"><code>sync_direction</code></td><td><code>IMPORT</code> / <code>EXPORT</code></td><td>들여오나, 평가 결과를 고객사 DB 로 내보내나</td></tr>
+            <tr><td class="scope-name"><code>sync_key_mode</code></td><td><code>INCREMENTAL</code> / <code>FILTER</code></td><td class="wrap">어디까지 읽었는지를 키 값으로 기억하나, 조건으로 거르나</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><code>ORACLE</code> 과 <code>MARIADB</code> 는 수집기 클래스가 다르지만 둘 다 <code>OracleSyncService.syncFromOracle</code> 을 부른다. 이름에 Oracle 이 박혀 있지만 연결 빌더가 타입을 보고 갈라질 뿐 로직은 하나다. 이 이름이 9절 함정 하나의 원인이기도 하다.</p>
+      <h3>3.2 <code>sttanalytics</code> — 명사 일곱, 셋만</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>엔티티</th><th>테이블</th><th>한 줄</th></tr></thead>
+          <tbody>
+            <tr><td class="scope-name wrap"><code>SttAnalysisFolder</code> → <code>SttAnalysisCall</code> → <code>SttAnalysisUtterance</code></td><td class="wrap"><code>stt_analysis_folder</code> · <code>_call</code> · <code>_utterance</code></td><td>업로드한 폴더, 그 안의 통화, 통화의 발화</td></tr>
+            <tr><td class="scope-name wrap"><code>SttAnalysisJob</code> → <code>SttAnalysisChunk</code></td><td class="wrap"><code>stt_analysis_job</code> · <code>_chunk</code></td><td>분류 작업 하나와 50건씩 자른 조각</td></tr>
+            <tr><td class="scope-name wrap"><code>SttAnalysisCallClassification</code></td><td class="wrap"><code>stt_analysis_call_classification</code></td><td>통화별 최신 분류 포인터. 원장은 MongoDB</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><code>stt_analysis_utterance</code> 는 1단계의 <code>stt_messages</code> 와 닮았지만 다른 테이블이다. 화자 컬럼 이름이 <code>speaker</code> 고 값이 rx/tx 파일에서 왔다. 두 테이블 사이에 외래키도 없고 조인도 없다. 이 모듈은 우리 저수지의 물이 아니라 바깥에서 가져온 상자를 다룬다.</p>
+      <p>상태는 넷을 외우면 된다. 작업은 <code>PENDING → RUNNING → COMPLETED / FAILED / PAUSED</code>, 조각은 <code>PENDING → RUNNING → COMPLETED</code>(외부 배치면 중간에 <code>SUBMITTED_REMOTE</code>), 통화는 <code>UNCLASSIFIED → CLASSIFYING → CLASSIFIED</code>, 전략은 <code>SINGLE / GROUPED / EXTERNAL_BATCH</code>.</p>
+    </section>
+    <section id="s4">
+      <h2><span class="num">04</span><span>DB 실습 — 코드 전에 데이터부터</span></h2>
+      <p class="lede">쿼리 넷. 셋째가 이 글의 첫 문단이고 넷째가 석 달째 반복되는 실패다.</p>
+      <div class="code">
+        <div class="code-head">BASH</div>
+<pre>docker exec -it mariadb mariadb -u &lt;계정&gt; -p local_db</pre>
+      </div>
+      <div class="code">
+        <div class="code-head">SQL</div>
+<pre><span class="c-dim">-- 1) 데이터소스 아홉. 무엇을 어디서 읽는가</span>
+SELECT id, name, type, enabled, sync_target_type, sync_direction, sync_key_column,
+       oracle_master_table, oracle_detail_table, last_sync_time, total_synced_count
+FROM recording_data_source;
+
+<span class="c-dim">-- 2) 스케줄의 시계</span>
+SELECT id, data_source_id, name, cron_expression, enabled, last_execution_time,
+       next_execution_time, last_execution_status, NOW() AS now
+FROM recording_schedule;
+
+<span class="c-dim">-- 3) 이 글의 첫 문단</span>
+SELECT schedule_id, status, COUNT(*) n, MIN(started_at), MAX(started_at)
+FROM recording_execution_history GROUP BY 1, 2 ORDER BY 1, 2;
+
+<span class="c-dim">-- 4) 가장 최근 실패의 이유</span>
+SELECT id, schedule_id, status, started_at, duration_ms, total_records, success_records, error_message
+FROM recording_execution_history ORDER BY id DESC LIMIT 5;</pre>
+      </div>
+      <p>1번은 아홉 줄이다. Oracle 넷(하나는 꺼짐), MariaDB 다섯. <code>sync_target_type</code> 은 <code>STT</code> 여섯에 <code>EVALUATION_TARGET</code> 셋이고 전부 <code>IMPORT</code> 다. <code>oracle_master_table</code> 에 <code>VW_RECORDINGINDEX</code> 가 여섯 번 나온다. 고객사 Oracle 의 뷰 이름인데, 로컬 MariaDB 에 같은 이름의 테이블을 만들어 두고 흉내를 낸 것이다. <code>SHOW TABLES LIKE 'VW_%'</code> 를 쳐 보면 둘이 나온다.</p>
+      <p>2번은 일곱 줄 중 셋만 켜져 있다. 7번은 매년 7월 14일 한 번 도는 테스트용이라 다음이 2027년이고, 8번과 9번은 매월 1일 09:00 이다. 둘 다 <code>last_execution_status</code> 가 <code>FAILED</code> 다. 4번이 그 이유를 보여 준다. 9월 1일과 10월 1일 두 번 다 같은 메시지로 죽었다. <code>bad SQL grammar [SELECT COUNT(*) FROM VW_RECORDINGINDEX A WHERE A.CALL_DATETIME &gt; TO_TIMESTAMP(?, ...)]</code>. MariaDB 에 Oracle 의 날짜 함수를 보낸 것이다. 9절에서 왜 그렇게 되는지 짚는다.</p>
+      <p>3번이 첫 문단이다. 2분 cron 의 1번 스케줄이 15,453줄, 3분 cron 의 2번이 10,511줄. 그 둘이 1월 22일에 시작해 4월 9일에 멈췄다. <code>RUNNING</code> 22줄은 2월과 3월 것이다. 서버가 그 사이에 몇 번 죽었다는 뜻이고, 이 모듈에는 그걸 치워 주는 잡이 없다. 2단계의 <code>cleanupStaleExecutions</code> 같은 것이 여기에는 없다.</p>
+      <p><code>sttanalytics</code> 쪽 테이블 일곱은 로컬에 전부 0건이다. 이 기능을 로컬에서 써 본 적이 없다는 뜻이다. 그래서 6절은 데이터 없이 코드와 주석만으로 그린다.</p>
+      <div class="note is-key">
+        <p class="note-title">운하로 들어온 통화를 1단계 쿼리로 찾아보자.</p>
+        <p><code>stt_events</code> 에서 <code>created_at</code> 이 같은 초에 S 와 E 가 같이 찍힌 통화가 그것이다. <code>createSttEventsForBatch</code> 가 시작·종료 이벤트를 한 번에 만들어 <code>now</code> 를 둘 다에 적기 때문이다. 실시간으로 들어온 통화는 둘 사이가 통화 시간만큼 벌어져 있다.</p>
+      </div>
+    </section>
+    <section id="s5">
+      <h2><span class="num">05</span><span>recording — <code>pollSchedules</code> 에서 이벤트 발행까지</span></h2>
+      <p class="lede">60초 폴링에서 완료 이벤트까지. 2단계 스케줄러의 축소판에 락이 빠져 있다.</p>
+      <h3>5.1 <code>RecordingScheduler</code> (60~316줄)</h3>
+      <p>2단계의 평가 스케줄러를 봤으면 이 파일은 축소판이다. 60초마다 <code>pollSchedules</code> 가 <code>findSchedulesToExecute(now)</code> 를 부른다. 조건은 셋뿐이다. <code>enabled</code>, <code>next_execution_time IS NOT NULL</code>, <code>next_execution_time &lt;= now</code>. 락이 없다. 서버가 둘이면 둘 다 같은 스케줄을 집는다. <code>OracleSyncService</code> 가 데이터소스 단위로 <code>activeSyncIds</code> 라는 메모리 맵으로 중복을 막지만 그건 한 JVM 안에서만 통한다.</p>
+      <p>걸린 스케줄마다 <code>executeScheduleAsync(scheduleId)</code> 로 넘긴다. <code>@Async("recordingTaskExecutor")</code> 고 풀은 다섯이다. 이 메서드에는 <code>@Transactional</code> 이 없고, 주석이 2단계와 같은 말을 한다. 수집이 오래 걸리면 커넥션이 샌다. 그래서 <code>fetchScheduleWithDataSource</code> 와 <code>createExecutionHistory</code> 와 <code>completeExecution</code> 이 각자 짧은 트랜잭션이고, 가운데 <code>collectionEngine.collect(schedule, history)</code> 는 트랜잭션 밖이다.</p>
+      <p><code>completeExecution</code> (237줄) 이 결과를 적는다. 이력에 건수와 시간을 쓰고, 스케줄의 <code>last_execution_time</code> 과 <code>next_execution_time</code> 을 갱신한다. <code>next_execution_time = cron.next(지금)</code> 이다. 2단계와 같은 규칙이고 같은 함정이다. 그다음 알림센터에 한 줄 남기고, 들여오기 방향이고 성공이거나 부분 성공이면 <code>RecordingSyncCompletedEvent</code> 를 발행한다. 이 이벤트의 구독자는 하나다. 2단계에서 본 <code>EvaluationReadinessListener</code> 가 받아서 <code>PENDING</code> 대상을 <code>DATA_READY</code> 로 올린다.</p>
+      <h3>5.2 <code>CollectionEngineImpl.collect</code> (37~137줄) — 갈림길 셋</h3>
+      <p>첫 갈림길은 <code>sync_direction</code>. <code>EXPORT</code> 면 수집기를 고르지 않고 <code>ExportSyncService</code> 로 바로 간다. 평가 결과를 고객사 DB 에 써 주는 반대 방향이다. 둘째는 <code>type.isDatabase()</code>. DB 타입이면 저장 경로 검증을 건너뛰고, 파일 타입이면 저장 디렉토리를 먼저 확인한다. 셋째가 <code>collectorFactory.getCollector(type)</code>. 팩토리는 Spring 이 주입한 <code>IDataCollector</code> 일곱을 <code>getSupportedType()</code> 기준으로 맵에 넣어 두고 꺼내 준다. 새 타입을 붙이려면 enum 에 값 하나, 구현체 하나면 된다.</p>
+      <p><code>OracleDataCollector</code> 와 <code>MariaDbDataCollector</code> 는 둘 다 한 줄짜리다. <code>oracleSyncService.syncFromOracle(dataSource.getId())</code>. 그래서 6번 파일로 간다.</p>
+      <h3>5.3 <code>OracleSyncService.syncFromOracle</code> (119줄) — 운하의 본체</h3>
+      <p><code>activeSyncIds.putIfAbsent</code> 로 같은 데이터소스의 동시 실행을 막고 <code>doSyncFromOracle</code> 로 들어간다. 거기서 첫 번째로 보는 것이 <code>sync_target_type</code> 이다. <code>EVALUATION_TARGET</code> 이면 <code>syncEvaluationTargetFromOracle</code> 로 빠지고, 그 안에서 7번 파일 <code>EvaluationTargetSyncStrategy</code> 가 일한다. <code>STT</code> 면 아래로 계속 간다.</p>
+      <p>STT 길은 이렇다. 컬럼 매핑(<code>column_mapping</code> JSON)을 읽고, 바깥 DB 에 <code>JdbcTemplate</code> 을 연다. <code>countMasterRecords</code> 로 읽을 통화 수를 센다. 0 이면 바로 끝. 아니면 마스터 뷰를 페이지로 읽으면서 페이지마다 <code>sttEventRepository.findExistingCallIds</code> 로 이미 있는 통화를 거르고, 페이지를 다시 청크로 잘라 <code>processChunk</code> 를 부른다. 청크 하나가 트랜잭션 하나다. 다 돌면 <code>last_sync_time</code> 과 <code>last_sync_key_value</code> 를 데이터소스에 적는다. 다음 실행은 거기서부터 읽는다.</p>
+      <p><code>processChunk</code> (625줄) 안에서 통화 한 건은 이렇게 된다. 마스터 한 행으로 <code>STTEvent</code> 둘을 만든다. <code>S</code> 하나, <code>E</code> 하나. <code>E</code> 의 시각은 <code>S</code> 에 <code>talkTime</code> 초를 더한 값이다. 그다음 상세 뷰에서 그 통화의 문장을 전부 읽어 <code>STTMessage</code> 로 만든다. 화자는 <code>RXTX_KIND</code> 컬럼이다. 1 이면 <code>RX</code>(고객), 2 면 <code>TX</code>(상담사), 9 면 <code>MIX</code>. <code>mapChannelType</code> (1386줄) 이 그 표다. 그 값을 <code>call_type</code> 과 <code>channel_type</code> 둘 다에 넣는다. 1단계에서 "<code>call_type</code> 이 정답이고 <code>channel_type</code> 은 폐기 컬럼"이라고 했는데, 8월 7일 커밋이 이 자리를 고치면서 남긴 주석이 그 사연을 그대로 적어 두었다. 예전에는 통화 방향(IN/OUT)을 화자 칸에 넣어서 화면에 화자가 안 떴다.</p>
+      <h3>5.4 <code>EvaluationTargetSyncStrategy.processChunk</code> (83줄) — 2단계의 <code>EXTERNAL_SYNC</code> 가 태어나는 자리</h3>
+      <p>행 하나가 <code>EvaluationTarget</code> 하나다. <code>buildEvaluationTarget</code> (260줄) 을 보면 <code>source(EXTERNAL_SYNC)</code> 와 <code>evaluationStatus(PENDING)</code> 이 박혀 있다. 2단계 3절의 상태 그림에서 맨 왼쪽 <code>PENDING</code> 이 여기다. <code>externalKey</code> 는 고객사 원본 키고 중복 판정의 기준이다. 콜 ID 는 <code>callIds</code> 컬럼이 있으면 쉼표나 파이프로 잘라 <code>EvaluationTargetCall</code> 여러 줄로, 없으면 <code>callId</code> 하나로 한 줄 만든다. 2단계에서 "콜 ID 는 자식 테이블에 1:N" 이라고 쓴 이유가 이 분기다.</p>
+      <p>저장은 <code>saveAll</code> 두 번이다. 대상을 먼저 저장하고, 돌려받은 managed 엔티티를 외부 키로 다시 찾아 콜 매핑에 꽂은 뒤 매핑을 저장한다. 그 뒤 <code>completeExecution</code> 이 이벤트를 띄우고, <code>EvaluationReadinessListener</code> 가 <code>stt_messages</code> 에 발화가 있는 대상만 <code>DATA_READY</code> 로 올리면, 2단계의 60초 폴링이 그걸 집어 간다. 운하 둘이 저수지에서 만나는 지점이 이것이다. 하나는 발화를, 하나는 평가 대상을 넣고, 발화가 먼저 와 있어야 대상이 자격을 얻는다.</p>
+    </section>
+    <section id="s6">
+      <h2><span class="num">06</span><span>sttanalytics — 지도만</span></h2>
+      <p class="lede">들이기, 자르기, 매기기. 데이터 없이 주석으로 그린 지도.</p>
+      <p>이 모듈은 5월 초에 spec 042 로 한 번에 지어졌고 <code>package-info.java</code> 열여덟 줄에 설계 원칙이 다 적혀 있다. 그 원칙이 2단계에서 본 것과 같다. 중첩 <code>REQUIRES_NEW</code> 0건, <code>readOnly</code> 안 LLM 호출 0건, 모든 트랜잭션에 <code>timeout</code>. 그 밑에서 길은 세 토막이다.</p>
+      <p><strong>들이기.</strong> <code>POST /api/sttanalytics/folders/upload</code> 가 파일 묶음을 받는다. <code>SttFileIngestionServiceImpl</code> (1,678줄) 이 인코딩을 맞추고, 파일명에서 통화 키와 내선번호를 뽑고, 내선번호별로 묶어 스레드 다섯으로 나눠 각자 트랜잭션에서 <code>stt_analysis_utterance</code> 에 넣는다. 같은 (통화, 시각, 화자, 문장) 4-튜플은 버린다. 폴더의 <code>call_count</code> 를 올리고 끝. 업로드가 끝나면 기본값으로 분류 작업을 바로 만든다(<code>autoStartJob=true</code>).</p>
+      <p><strong>자르기.</strong> <code>POST /api/sttanalytics/jobs</code> 가 <code>SttAnalysisJobServiceImpl.createJob</code> (200줄) 이다. 폴더에 든 통화 ID 를 모아 50건씩 <code>stt_analysis_chunk</code> 로 자른다(외부 배치 전략이면 4,000건). 그다음 <code>runJobAsync</code> 로 넘긴다. <code>runJob</code> (513줄) 은 트랜잭션 밖에서 조각을 하나씩 집는데, 집는 방법이 <code>tryClaimChunk</code> 다. UPDATE 한 줄로 <code>claimed_by</code> 에 워커 ID 를 적고 1건이 바뀌었을 때만 내 것이다. 2단계 스케줄 락과 같은 수법이고, 서버가 여럿이어도 한 조각은 한 번만 처리된다. 조각 안에서는 <code>BatchStrategy</code> 가 일한다. <code>SINGLE</code> 은 통화 하나에 AI 호출 하나, <code>GROUPED</code> 는 여러 통화를 한 프롬프트에 묶기, <code>EXTERNAL_BATCH</code> 는 vLLM 이나 OpenAI 의 배치 API 에 던지고 30초 폴링 워커가 결과를 가져오는 방식이다.</p>
+      <p><strong>매기기와 남기기.</strong> <code>CounselTypeClassificationServiceImpl.classifyCall</code> (154줄) 이 통화 하나를 분류한다. 발화를 따로 트랜잭션에서 읽어 커넥션을 돌려주고, 프롬프트에 상담유형 카탈로그와 예시를 끼워 AI 를 부르고, 신뢰도가 공급자별 문턱(설정값)을 넘으면 <code>counseltype</code> 모듈의 <code>autoRegisterIfMissing</code> 으로 새 유형을 등록한다. 1단계 보너스에서 본 <code>counseltype</code> 이 여기 손님이다. 결과는 <code>SttClassificationCompletedEvent</code> 로 나가고, <code>ClassificationStatisticsListener</code> (464줄) 가 커밋 뒤에 받아 MongoDB <code>stt_classification_result</code> 에 한 건 적고, <code>stt_analysis_call_classification</code> 포인터를 갱신하고, 통화 상태와 작업 카운터를 올리고, STOMP 로 진행률을 쏜다. 그 Mongo 컬렉션을 <code>SttAnalyticsController</code> 열한 개 엔드포인트가 읽어 추이·시간대·예측·pptx 보고서를 만든다.</p>
+      <p>이 모듈이 stt 모듈과 어디서 만나는지 찾아보았다. 만나지 않는다. <code>sttanalytics</code> 안에 <code>stt.event</code> 를 import 하는 파일이 없다. 1단계 글에 "<code>sttanalytics</code> 가 stt 이벤트를 받아서 분석한다"고 쓴 문장은 틀렸고, 이 글을 쓰면서 고쳤다. 상자 공장은 강에 닿아 있지 않다.</p>
+    </section>
+    <section id="s7">
+      <h2><span class="num">07</span><span>다음 단계로 가는 다리</span></h2>
+      <p class="lede">AI 를 부르는 자리 둘이 4단계의 같은 문으로 들어간다.</p>
+      <p>4단계는 <code>ai</code> 모듈 1,227개 파일 중 세 패키지다. 이 글에서 AI 를 부르는 자리를 둘 봤다. 2단계의 <code>AIEvaluationService</code> 는 <code>aiModelFallbackClient</code> 를, 이 글의 <code>classifyCall</code> 은 <code>aiOrchestrator.execute</code> 를 부른다. 둘 다 <code>ai/execution/</code> 으로 들어간다. 프롬프트는 둘 다 <code>ai/prompt/</code> 의 템플릿(<code>PromptType.COUNSEL_TYPE_CLASSIFY</code>, <code>EVALUATION_OUTPUT_CONTRACT</code>)에서 온다. 모델을 고르고 실패하면 다음 모델로 넘기는 건 <code>ai/routing/</code> 이다. 4단계는 이 셋을 연다. 나머지는 지도만 본다.</p>
+    </section>
+    <section id="s8">
+      <h2><span class="num">08</span><span>함정 모음</span></h2>
+      <p class="lede">아홉 가지. 첫째는 지금도 매월 1일 실패하고 있다.</p>
+      <ol><li><strong>MariaDB 데이터소스에 <code>last_sync_time</code> 이 생기면 죽는다.</strong> <code>countMasterRecords</code> 의 레거시 STT 길(788줄)이 <code>sync_key_column</code> 이 없고 <code>last_sync_time</code> 이 있으면 <code>TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS')</code> 를 붙인다. Oracle 전용 함수다. 그 값이 비어 있으면 조건 없이 읽어 성공하고, 값이 들어가면 그다음부터 매번 <code>bad SQL grammar</code> 다. 로컬 8번·9번 스케줄은 7월에 성공하다가 8월 1일부터 석 달째 같은 메시지로 죽고 있다. 피해 가는 길은 <code>sync_key_column</code> 을 지정하는 것이다. 10번 데이터소스는 <code>CALL_DATETIME</code> 을 키로 걸어 653건을 멀쩡히 넣었다.</li><li><strong><code>RUNNING</code> 은 아무도 치우지 않는다.</strong> 수집 도중 서버가 죽으면 이력이 <code>RUNNING</code> 으로 남고, 로컬에 22줄이 그렇다. 2단계와 달리 정체 정리 잡이 없다. 다만 다음 실행을 막지는 않는다. 평가 쪽은 진행 중 실행이 있으면 건너뛰지만 여기는 그런 가드가 없다.</li><li><strong>스케줄에는 락이 걸리지 않는다.</strong> <code>findSchedulesToExecute</code> 에 <code>lock_owner</code> 조건이 없다. 서버 둘이 같은 스케줄을 동시에 집을 수 있고, 데이터소스 단위 중복 방지는 JVM 메모리 맵이라 서버를 넘지 못한다.</li><li><strong>운하는 강어귀를 거치지 않는다.</strong> 동기화로 들어온 통화는 <code>SttIngestFilter</code> 도, 실시간 방송도, <code>SttCallCompletedEvent</code> 도 없다. 상담보조·워크플로우 트리거가 그 통화에 대해 아무것도 하지 않는 것이 정상이다.</li><li><strong><code>next_execution_time</code> 은 <code>cron.next(지금)</code>.</strong> 2단계와 같은 규칙이다. 서버가 죽었다 뜨면 밀린 스케줄이 시간대와 무관하게 한 번 돈다.</li><li><strong>2분 cron 을 로컬에 켜 두면 하루 720줄이 쌓인다.</strong> 1번 스케줄이 그렇게 15,453줄을 만들었다. 이력 테이블에 보존 정리가 없다.</li><li><strong><code>recording_data</code> 는 쓰는 곳이 없다.</strong> 수집기 일곱 중 아무도 이 테이블에 쓰지 않는다. 화면의 "녹취 데이터" 목록이 비어 있어도 수집이 안 된 게 아니다. 들어온 통화는 <code>stt_events</code> 에서 센다.</li><li><strong><code>EvaluationQueue</code> 는 폐기된 길이다.</strong> <code>EvaluationTriggerServiceImpl</code> 의 <code>@Scheduled</code> 둘이 주석 처리되어 있고, 메서드는 0 을 돌려준다. <code>/api/recording/evaluation</code> 엔드포인트 열셋이 아직 열려 있지만 평가는 2단계의 계획이 한다.</li><li><strong><code>sttanalytics</code> 는 <code>stt_messages</code> 를 읽지 않는다.</strong> 자기 테이블 <code>stt_analysis_utterance</code> 만 본다. 실시간으로 들어온 통화를 상담유형 분류하려면 이 모듈이 아니라 <code>counseltype</code> 의 자동 분류 쪽을 봐야 한다.</li></ol>
+    </section>
+    <section id="s9">
+      <h2><span class="num">09</span><span>자가진단</span></h2>
+      <p class="lede">열 문항. 여덟 이상이면 4단계로.</p>
+      <ol><li><code>recording</code> 이 <code>stt_messages</code> 에 쓰는 메서드와 줄 번호. 그 길에 없는 세 가지.</li><li><code>sync_target_type</code> 두 값이 각각 어느 테이블에 쓰는가.</li><li><code>EXTERNAL_SYNC</code> 대상이 태어날 때의 <code>evaluation_status</code> 와, 그것을 <code>DATA_READY</code> 로 올리는 이벤트 이름.</li><li>수집기 일곱 중 둘이 같은 서비스를 부른다. 그 둘과 그 서비스.</li><li><code>RXTX_KIND</code> 1·2·9 가 각각 무엇이 되나.</li><li>로컬 8번·9번 스케줄이 매월 1일 실패하는 이유와 피해 가는 설정.</li><li><code>recording_execution_history</code> 에 <code>RUNNING</code> 22줄이 남아 있는 이유.</li><li><code>sttanalytics</code> 가 통화를 몇 건씩 자르고, 조각을 집는 방법은 무엇인가.</li><li>분류 결과의 원장은 어디고 포인터는 어디인가.</li><li><code>sttanalytics</code> 와 <code>stt</code> 모듈이 만나는 지점.</li></ol>
+      <p>여덟 이상이면 4단계로 간다. 4단계는 <code>ai</code> 의 <code>execution</code> · <code>prompt</code> · <code>routing</code> 이다. 이 글의 <code>classifyCall</code> 과 2단계의 <code>evaluateWithPrompt</code> 가 거기서 같은 문을 지난다.</p>
+    </section>
+    <section id="s10">
+      <h2><span class="num">10</span><span>파일 위치 요약</span></h2>
+      <p class="lede">관심사별 파일 위치.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>관심사</th><th>파일</th><th>줄</th></tr></thead>
+          <tbody>
+            <tr><td>데이터소스 설정 enum 넷</td><td class="wrap"><code>recording/entity/DataSource.java</code></td><td>416</td></tr>
+            <tr><td class="wrap">스케줄 시계 (<code>shouldExecute</code> · <code>updateExecutionResult</code>)</td><td class="wrap"><code>recording/entity/RecordingSchedule.java</code></td><td>90 · 107</td></tr>
+            <tr><td>60초 폴링 · 비동기 실행 · 완료 처리</td><td class="wrap"><code>recording/scheduler/RecordingScheduler.java</code></td><td>60 · 117 · 237</td></tr>
+            <tr><td class="wrap">갈림길 셋 (EXPORT · DB/파일 · 수집기 선택)</td><td class="wrap"><code>recording/collector/CollectionEngineImpl.java</code></td><td>37~137</td></tr>
+            <tr><td>수집기 팩토리 · 구현 일곱</td><td class="wrap"><code>recording/collector/DataCollectorFactory.java</code> · <code>collector/impl/</code></td><td>91</td></tr>
+            <tr><td class="wrap">STT 동기화 본체 · 청크 · 화자 표 · Oracle 전용 SQL</td><td class="wrap"><code>recording/service/OracleSyncService.java</code></td><td>119 · 625 · 1386 · 788</td></tr>
+            <tr><td>평가 대상 동기화</td><td class="wrap"><code>recording/service/sync/EvaluationTargetSyncStrategy.java</code></td><td>83 · 260</td></tr>
+            <tr><td>완료 이벤트 → 2단계</td><td class="wrap"><code>recording/event/RecordingSyncCompletedEvent.java</code> → <code>evaluation/listener/EvaluationReadinessListener.java</code></td><td>52</td></tr>
+            <tr><td class="wrap">설정 (폴링 60초 · 풀 5 · 실행 타임아웃 3,600초)</td><td><code>application.yml</code></td><td><code>recording.*</code></td></tr>
+            <tr><td>모듈 설계 원칙</td><td class="wrap"><code>sttanalytics/package-info.java</code></td><td>18</td></tr>
+            <tr><td>업로드 · 합본</td><td class="wrap"><code>sttanalytics/service/impl/SttFileIngestionServiceImpl.java</code></td><td>197 · 369 · 929</td></tr>
+            <tr><td>작업 생성 · 조각 처리 · 클레임</td><td class="wrap"><code>sttanalytics/service/impl/SttAnalysisJobServiceImpl.java</code></td><td>200 · 513 · 660 · 734</td></tr>
+            <tr><td>통화 하나 분류</td><td class="wrap"><code>sttanalytics/service/impl/CounselTypeClassificationServiceImpl.java</code></td><td>154</td></tr>
+            <tr><td class="wrap">결과 적재 리스너 (Mongo · 포인터 · 카운터)</td><td class="wrap"><code>sttanalytics/event/listener/ClassificationStatisticsListener.java</code></td><td>464</td></tr>
+            <tr><td>전략 셋</td><td class="wrap"><code>sttanalytics/strategy/impl/SingleCallStrategy</code> · <code>GroupedPromptStrategy</code> · <code>ExternalBatchApiStrategy</code></td><td>151 · 925 · 485</td></tr>
+            <tr><td>화면</td><td class="wrap"><code>web-react/src/pages/RecordingDataPage.tsx</code> · <code>stt-batch/SttBatchPage.tsx</code> · <code>CounselTypeAnalyticsPage.tsx</code></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <div class="closing">
+      <h2><span class="num">■</span><span>기억할 것</span></h2>
+      <ol>
+        <li><strong>recording 은 강어귀 옆의 운하다.</strong> stt_events 와 stt_messages 에 직접 쓴다. 필터도 방송도 종료 이벤트도 없다.</li>
+        <li><strong>EXTERNAL_SYNC 대상은 여기서 PENDING 으로 태어난다.</strong> 완료 이벤트를 받은 evaluation 이 발화가 있는 것만 DATA_READY 로 올린다.</li>
+        <li><strong>MariaDB 소스는 sync_key_column 을 걸어야 산다.</strong> 없으면 last_sync_time 이 생기는 순간부터 Oracle 전용 TO_TIMESTAMP 로 죽는다.</li>
+        <li><strong>녹취 스케줄러에는 락도 정체 정리도 없다.</strong> RUNNING 이 남아도 다음 실행은 막히지 않는다.</li>
+        <li><strong>sttanalytics 는 stt 와 선이 닿지 않는다.</strong> 자기 테이블에 올린 파일을 50건씩 잘라 분류하고 MongoDB 에 남긴다.</li>
+      </ol>
+    </div>
+
+    <div class="note">
+      <p class="note-title">시리즈</p>
+      <p><a href="/advisor/">목차</a> · 이전: <a href="/advisor/evaluation-module.html">evaluation 모듈</a> · 다음: 4단계 ai (예정)</p>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
