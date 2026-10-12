@@ -84,7 +84,7 @@
     </section>
     <section id="s1">
       <h2><span class="num">01</span><span>전체 학습 경로</span></h2>
-      <p class="lede">큰 모듈은 패턴을 보여 주기 전에 사람을 지치게 한다. 작은 것부터.</p>
+      <p class="lede">어디서 시작해 어디로 가는지. 일곱 단계와 그 순서의 이유.</p>
       <p>가장 크고 가장 바쁜 모듈은 <code>ai</code> 와 <code>kms</code> 와 <code>agi</code> 다. 그래서 거기서 시작하면 안 된다. 큰 모듈은 패턴을 보여 주기 전에 사람을 먼저 지치게 한다. 작은 모듈에서 구조를 익히고, 그 구조가 손에 붙은 뒤에 큰 쪽으로 건너간다.</p>
       <div class="table-wrap">
         <table>
@@ -124,8 +124,8 @@
     </section>
     <section id="s2">
       <h2><span class="num">02</span><span>모듈 파헤치기 공통 루틴</span></h2>
-      <p class="lede">61개 모듈은 생김새가 같다. 하나를 여는 손이면 된다.</p>
-      <p>61개 모듈은 생김새가 같다. 하나를 여는 법만 익히면 나머지는 같은 손으로 열린다.</p>
+      <p class="lede">어떤 모듈이든 같은 다섯 단계로 연다. 이 가이드의 핵심 도구다.</p>
+      <p>61개 모듈은 생김새가 같다. 하나를 여는 법만 익히면 나머지도 같은 방식으로 열린다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>1) PROJECT_INDEX.md 에서 해당 모듈 한 줄 설명 확인
@@ -208,8 +208,8 @@
     </section>
     <section id="s4">
       <h2><span class="num">04</span><span>[0단계] auth — 로그인</span></h2>
-      <p class="lede">첫 만남과 그 뒤의 매일. auth 와 core/security 가 사는 시간이 다르다.</p>
-      <p><code>auth</code> 와 <code>core/security</code> 는 자주 섞인다. 둘은 다른 시간을 산다. <code>auth</code> 는 로그인 그 순간의 일이다. 아이디와 비밀번호를 대조하고 토큰을 발급한다. <code>core/security</code> 는 그다음 모든 요청에서 발급된 토큰을 다시 확인한다. 첫 만남과 그 뒤의 매일.</p>
+      <p class="lede">로그인 그 순간의 일. core/security 와 무엇이 다른지.</p>
+      <p><code>auth</code> 와 <code>core/security</code> 는 자주 섞인다. 둘은 다른 시간을 산다. <code>auth</code> 는 로그인 그 순간의 일이다. 아이디와 비밀번호를 대조하고 토큰을 발급한다. <code>core/security</code> 는 그다음 모든 요청에서 발급된 토큰을 다시 확인한다. 하나는 첫 만남이고 하나는 그 뒤의 매일이다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th></th><th>역할</th></tr></thead>
@@ -248,7 +248,7 @@ curl -X POST http://localhost:10302/api/auth/login \
     <section id="s5">
       <h2><span class="num">05</span><span>[0단계] permission — 권한</span></h2>
       <p class="lede">코드보다 DB 를 먼저 본다. 엔티티 아홉과 시드 함정, 그리고 7월 이후 가장 많이 바뀐 자리.</p>
-      <p>이 모듈은 코드보다 DB 를 먼저 보는 쪽이 빠르다. 70개 파일이 있지만 엔티티 아홉 개가 전부이고, 나머지는 그 아홉을 읽고 쓰는 손이다.</p>
+      <p>이 모듈은 코드보다 DB 를 먼저 보는 쪽이 빠르다. 70개 파일이 있지만 엔티티 아홉 개가 전부이고, 나머지는 그 아홉을 읽고 쓰는 코드다.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>엔티티</th><th>용도</th></tr></thead>
@@ -285,7 +285,7 @@ SELECT * FROM permissions LIMIT 20;</pre>
     <section id="s6">
       <h2><span class="num">06</span><span>[1단계] stt — 패턴 체득, 실질적 시작점</span></h2>
       <p class="lede">가장 작은 모듈로 손을 만든다. 글 하나로 따로 뗐다.</p>
-      <p>이 단계는 글 하나로 따로 뗐다. <strong><a href="/advisor/stt-module.html">stt 모듈 — 모듈 구조 패턴 체득</a></strong> 을 읽는다.</p>
+      <p>이 단계는 글 하나로 따로 뗐다. <strong><a href="/advisor/stt-module.html">stt 모듈 — 모듈 구조 패턴 체득</a></strong> 글을 읽는다.</p>
       <p>7월에 28개 파일이던 모듈이 지금은 65개다. 늘어난 37개는 대부분 통화의 계보를 기록하는 <code>lineage/</code> 와 발화를 외부 AI 로 보내도 되는지 판정하는 <code>policy/</code> 인데, 1단계에서는 둘 다 건너뛴다. 읽을 파일 여섯과 순서는 그대로다.</p>
       <div class="code">
         <div class="code-head">도식</div>
@@ -296,7 +296,7 @@ SELECT * FROM permissions LIMIT 20;</pre>
 5) service/STTService.java       saveSTTMessage (173~349줄) 만
 6) ingest/SttIngestFilter.java   인입 필터 (183줄, 전부)</pre>
       </div>
-      <p>목표는 STT 를 아는 것이 아니다. 모듈 하나를 여는 손을 만드는 것이다. 여기를 지나면 나머지 60개 모듈에서 어디를 봐야 할지 몸이 먼저 안다. 같은 크기대에 AI 자동 분류가 붙은 <code>counseltype</code>(35개)을 두 번째 표본으로 보면 "AI 호출이 붙으면 구조가 어떻게 달라지나"까지 보인다.</p>
+      <p>목표는 STT 를 아는 것이 아니다. 모듈 하나를 여는 순서를 몸에 붙이는 것이다. 여기를 지나면 나머지 60개 모듈에서 어디를 봐야 할지 먼저 보인다. 같은 크기대에 AI 자동 분류가 붙은 <code>counseltype</code>(35개)을 두 번째 표본으로 보면 "AI 호출이 붙으면 구조가 어떻게 달라지나"까지 보인다.</p>
     </section>
     <section id="s7">
       <h2><span class="num">07</span><span>[2단계] evaluation — 핵심 업무 도메인</span></h2>
@@ -373,8 +373,8 @@ FROM evaluation_schedule_config;</pre>
     </section>
     <section id="s8">
       <h2><span class="num">08</span><span>[3~6단계] 개요</span></h2>
-      <p class="lede">지도만 그려 둔다. 길은 필요해질 때 걷는다.</p>
-      <p>여기부터는 지도만 그려 둔다. 길은 필요해질 때 걷는다.</p>
+      <p class="lede">3~6단계는 지도만 그려 둔다. 길은 필요해질 때 걷는다.</p>
+      <p>여기부터는 모듈마다 한 문단씩만 적는다. 필요해지기 전에 더 읽어 둘 이유가 없고, 읽어 둬도 그때까지 남아 있지 않는다.</p>
       <h3>3단계 — <code>recording</code> (112) → <code>sttanalytics</code> (153)</h3>
       <p>통화가 밖에서 어떻게 들어와 분석되는지. <code>recording</code> 의 중심은 고객사 DB 의 뷰 테이블을 읽어 오는 수집기들이고, <code>recording/collector/impl/</code> 에 Oracle, MariaDB, API, FTP, SFTP, SCP, Local 일곱 종류가 나란히 있다.</p>
       <h3>4단계 — <code>ai</code> (1,227) — 전부 보지 말 것</h3>
@@ -458,8 +458,8 @@ npm test             # vitest (순차, CRITICAL 24)</pre>
     </section>
     <section id="s11">
       <h2><span class="num">11</span><span>최종 자가진단</span></h2>
-      <p class="lede">여덟 문항. 답할 수 있으면 0~2단계가 끝난 것이다.</p>
-      <p>아래에 답할 수 있으면 0~2단계가 끝난 것이다.</p>
+      <p class="lede">여덟 문항에 답할 수 있으면 0~2단계가 끝난 것이다.</p>
+      <p>구조, 인증·권한, 데이터, 업무 도메인 순서다. 막히는 문항이 있으면 그 절로 돌아간다.</p>
       <ol><li>새 기능의 REST API 를 추가하려면 어떤 디렉토리에 무슨 파일을 만드나?</li><li>임의의 모듈에서 "이 API 가 뭘 하는지" 5분 안에 찾아갈 수 있나?</li><li>특정 URL 이 인증 없이 열려 있는지 어디서 확인하나?</li><li>403 이 떴을 때 확인 순서는?</li><li>Entity 를 수정했다. 그다음 반드시 해야 할 일은?</li><li>새 모듈의 Repository 빈을 못 찾는다면 어디를 보나?</li><li>평가 대상이 <code>DATA_READY</code> 가 아니면 어떻게 되나?</li><li>설정한 Cron 시간이 아닌데 평가가 돌았다. 어디를 확인하나?</li></ol>
     </section>
 

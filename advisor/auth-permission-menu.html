@@ -125,11 +125,11 @@
           </tbody>
         </table>
       </div>
-      <p>401 이면 토큰 문제이고 403 이면 권한 문제다. 토큰을 분명히 보냈는데 401 이 온다면 대개 만료됐거나 <code>Bearer </code> 접두사가 빠진 것이다.</p>
+      <p>401 이면 토큰 문제이고 403 이면 권한 문제다. 토큰을 분명히 보냈는데 401 이 온다면 대개 만료됐거나 <code>Bearer</code> 접두사가 빠진 것이다.</p>
     </section>
     <section id="s3">
       <h2><span class="num">03</span><span>1차 관문 — URL 매트릭스 (SecurityConfig)</span></h2>
-      <p class="lede">순서가 곧 로직이다. 좁은 규칙이 위, 넓은 규칙이 아래.</p>
+      <p class="lede">파일이 셋이고 줄의 순서가 로직이다. 매트릭스를 읽는 다섯 가지 개념.</p>
       <h3>프로파일별로 파일이 셋이다</h3>
       <div class="table-wrap">
         <table>
@@ -149,7 +149,7 @@
         <p>239줄 주석에 따르면 운영 환경이 local 프로파일로 구동된 이력이 있다. 이름만 Local 이지 운영에서도 돈다.</p>
       </div>
       <h3>핵심 개념 ① — 순서가 곧 로직 (first match wins)</h3>
-      <p>규칙은 위에서 아래로 읽히고, 처음 맞는 규칙 하나만 적용된다.</p>
+      <p>규칙은 위에서 아래로 읽히고, 처음 맞는 규칙 하나만 적용된다. 그래서 줄의 순서가 곧 로직이다.</p>
       <div class="code">
         <div class="code-head">JAVA</div>
 <pre>.requestMatchers(HttpMethod.POST, "/api/stt/message").permitAll()   // 177줄
@@ -216,8 +216,8 @@
     </section>
     <section id="s4">
       <h2><span class="num">04</span><span>로그인 흐름</span></h2>
-      <p class="lede">SecurityConfig 는 토큰을 만들지 않는다. 그런데 로그인 요청은 이 설정을 지나간다.</p>
-      <p><code>SecurityConfig</code> 는 토큰을 만들지 않는다. 그런데 로그인 요청은 분명 이 설정을 지나간다. 두 가지 일만 한다.</p>
+      <p class="lede">토큰이 아직 없는 첫 요청이 설정 안에서 지나가는 길.</p>
+      <p>로그인 요청도 이 설정을 지나간다. 그런데 <code>SecurityConfig</code> 는 토큰을 만들지 않는다. 로그인에서 이 설정이 하는 일은 둘뿐이다.</p>
       <div class="code">
         <div class="code-head">도식</div>
 <pre>POST /api/auth/login  { username, password }
@@ -274,7 +274,7 @@
           </tbody>
         </table>
       </div>
-      <p>7월에 이 표를 처음 만들었을 때 1위는 <code>hasRole('ADMIN')</code> 467건이었고, <code>hasRole('ADMIN') or hasMenuPermission(...)</code> 패턴이 33건 있었다. 석 달 뒤 다시 세었더니 한 건이 남아 있었다. 그 사이에 "API 인가는 인증 여부로만, role 하드코딩 금지"(CRITICAL 19)와 "role 판정을 기능 권한으로 옮길 때는 같은 범위 · 관리자 단축 없음 · 호출부 전수"(CRITICAL 27)가 저장소 전체를 한 번 지나간 것이다.</p>
+      <p>7월에 이 표를 처음 만들었을 때 1위는 <code>hasRole('ADMIN')</code> 467건이었고, <code>hasRole('ADMIN') or hasMenuPermission(...)</code> 패턴이 33건 있었다. 두 달 반 뒤 다시 세었더니 한 건이 남아 있었다. 그 사이에 "API 인가는 인증 여부로만, role 하드코딩 금지"(CRITICAL 19)와 "role 판정을 기능 권한으로 옮길 때는 같은 범위 · 관리자 단축 없음 · 호출부 전수"(CRITICAL 27)가 저장소 전체를 한 번 지나간 것이다.</p>
       <h3><code>isAuthenticated()</code> 의 뜻</h3>
       <p>로그인만 되어 있으면 통과. 역할도 권한도 보지 않고, <code>JwtAuthenticationFilter</code> 가 명부에 이름을 적었는지만 본다. 이것이 기본값이 된 이유는 간단하다. 누가 무엇을 볼 수 있는지는 메뉴 매트릭스(DB)와 서비스의 범위 판정이 정하기 때문에, 컨트롤러는 "로그인했나"만 물으면 된다. 다만 <code>permitAll()</code> 로 내려가서는 안 된다. 그러면 "본인"이 누구인지 알 길이 없어진다.</p>
       <h3>커스텀 함수 (Spring 표준 아님)</h3>
@@ -519,6 +519,7 @@ public Page&lt;EvaluationResultDTO&gt; getMine(Pageable pageable) {
           </tbody>
         </table>
       </div>
+      <p>처음엔 대개 이렇게 쓴다.</p>
       <div class="code">
         <div class="code-head">JAVA</div>
 <pre><span class="c-bad">@PreAuthorize("hasRole('ADMIN')")              // ✗ 일반사용자가 본인 것을 못 지움 + CRITICAL 19 위반</span>
@@ -636,7 +637,6 @@ public void delete(@PathVariable Long id) {
       <ol>
         <li><strong>필터는 적고, 매트릭스가 막는다.</strong> 401 이면 토큰 문제, 403 이면 권한 문제다.</li>
         <li><strong>API 인가는 인증 여부로만 한다.</strong> hasRole 은 한 건 남았다. 되돌리기 어려운 행위는 hasFeature, 범위는 서비스, 메뉴 노출은 매트릭스.</li>
-        <li><strong>순서가 곧 로직이다.</strong> 좁은 규칙이 위, 넓은 규칙이 아래. 뒤집으면 아래 규칙은 영원히 차례가 오지 않는다.</li>
         <li><strong>@PreAuthorize 는 범위를 말할 줄 모른다.</strong> &#x27;자기 것만&#x27;은 서비스 코드가 토큰에서 신원을 꺼내 덮어쓴다.</li>
         <li><strong>path 가 접착제다.</strong> menu-definition.json 과 menu.ts 의 path 가 어긋나면 에러 없이 메뉴가 사라진다.</li>
         <li><strong>단건은 403 이 아니라 404 다.</strong> 존재 여부를 흘리지 않는다.</li>

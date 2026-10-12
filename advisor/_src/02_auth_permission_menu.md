@@ -71,7 +71,7 @@ HTTP 요청
 | 401 Unauthorized | 신원 자체가 없음 | 토큰 미첨부 / 만료 / 위조 → SecurityContext 가 비어 있음 |
 | 403 Forbidden | 신원은 있으나 권한 부족 | 로그인은 했지만 기능 권한 미달 |
 
-401 이면 토큰 문제이고 403 이면 권한 문제다. 토큰을 분명히 보냈는데 401 이 온다면 대개 만료됐거나 `Bearer ` 접두사가 빠진 것이다.
+401 이면 토큰 문제이고 403 이면 권한 문제다. 토큰을 분명히 보냈는데 401 이 온다면 대개 만료됐거나 `Bearer` 접두사가 빠진 것이다.
 
 ---
 
@@ -93,7 +93,7 @@ HTTP 요청
 
 ### 핵심 개념 ① — 순서가 곧 로직 (first match wins)
 
-규칙은 위에서 아래로 읽히고, 처음 맞는 규칙 하나만 적용된다.
+규칙은 위에서 아래로 읽히고, 처음 맞는 규칙 하나만 적용된다. 그래서 줄의 순서가 곧 로직이다.
 
 ```java
 .requestMatchers(HttpMethod.POST, "/api/stt/message").permitAll()   // 177줄
@@ -168,7 +168,7 @@ API 경로에 `hasRole` 을 새로 쓰지 않는다. 인가는 인증 여부로�
 
 ## 4. 로그인 흐름
 
-`SecurityConfig` 는 토큰을 만들지 않는다. 그런데 로그인 요청은 분명 이 설정을 지나간다. 두 가지 일만 한다.
+로그인 요청도 이 설정을 지나간다. 그런데 `SecurityConfig` 는 토큰을 만들지 않는다. 로그인에서 이 설정이 하는 일은 둘뿐이다.
 
 ```
 POST /api/auth/login  { username, password }
@@ -221,7 +221,7 @@ JWT 필터의 무대는 두 번째 요청부터다. 첫 요청에서 안내인�
 | 1 | `hasMenuPermission('admin')` |
 | 1 | `hasRole('ADMIN')` |
 
-7월에 이 표를 처음 만들었을 때 1위는 `hasRole('ADMIN')` 467건이었고, `hasRole('ADMIN') or hasMenuPermission(...)` 패턴이 33건 있었다. 석 달 뒤 다시 세었더니 한 건이 남아 있었다. 그 사이에 "API 인가는 인증 여부로만, role 하드코딩 금지"(CRITICAL 19)와 "role 판정을 기능 권한으로 옮길 때는 같은 범위 · 관리자 단축 없음 · 호출부 전수"(CRITICAL 27)가 저장소 전체를 한 번 지나간 것이다.
+7월에 이 표를 처음 만들었을 때 1위는 `hasRole('ADMIN')` 467건이었고, `hasRole('ADMIN') or hasMenuPermission(...)` 패턴이 33건 있었다. 두 달 반 뒤 다시 세었더니 한 건이 남아 있었다. 그 사이에 "API 인가는 인증 여부로만, role 하드코딩 금지"(CRITICAL 19)와 "role 판정을 기능 권한으로 옮길 때는 같은 범위 · 관리자 단축 없음 · 호출부 전수"(CRITICAL 27)가 저장소 전체를 한 번 지나간 것이다.
 
 ### `isAuthenticated()` 의 뜻
 
@@ -462,6 +462,8 @@ public Page<EvaluationResultDTO> getMine(Pageable pageable) {
 | 관리자 | 전체 | 전체 | 전체 |
 | 중간관리자 | 전체 | 전체 | 불가 |
 | 일반사용자 | 본인만 | 본인만 | 본인만 |
+
+처음엔 대개 이렇게 쓴다.
 
 ```java
 @PreAuthorize("hasRole('ADMIN')")              // ❌ 일반사용자가 본인 것을 못 지움 + CRITICAL 19 위반

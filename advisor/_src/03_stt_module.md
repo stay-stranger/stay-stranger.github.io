@@ -8,7 +8,7 @@
 
 ## 0. 이 단계의 목표
 
-STT 전문가가 되려는 게 아니다. 아무 모듈이나 열었을 때 손이 먼저 움직이게 하려는 것이다. 엔티티를 보고, DB 를 보고, 컨트롤러를 보고, 서비스 메서드 하나를 끝까지 따라가는 그 순서가 몸에 붙는 것. stt 는 그 연습용 표본이다. 여기서 익힌 손으로 2단계 `evaluation` 의 282개 파일을 연다.
+STT 전문가가 되려는 게 아니다. 아무 모듈이나 열었을 때 어디부터 볼지 망설이지 않게 하려는 것이다. 엔티티를 보고, DB 를 보고, 컨트롤러를 보고, 서비스 메서드 하나를 끝까지 따라가는 그 순서가 몸에 붙는 것. stt 는 그 연습용 표본이다. 여기서 익힌 순서로 2단계 `evaluation` 의 282개 파일을 연다.
 
 ### 7월 가이드 뒤에 바뀐 것
 
@@ -41,7 +41,7 @@ STT 전문가가 되려는 게 아니다. 아무 모듈이나 열었을 때 손�
                                    addressbot · simulation  ← 다른 모듈이 구독
 ```
 
-stt 는 강어귀다. 바깥에서 흘러온 물이 처음 닿는 자리이고, 여기서 하는 일은 물을 받아 두고 어디로 흘려보낼지 정하는 것뿐이다. 분석도 평가도 요약도 하지 않는다. 그 일은 `sttanalytics`(3단계)와 `evaluation`(2단계)과 `assist` 가 이 모듈이 띄운 이벤트를 받아서 한다.
+분석도 평가도 요약도 여기서는 하지 않는다. 강어귀는 물을 받아 두고 물길을 정할 뿐이고, 그 물에 무엇이 섞였는지 재는 일은 아래 물길의 몫이다. `sttanalytics`(3단계)와 `evaluation`(2단계)과 `assist` 가 이 모듈이 띄운 이벤트를 받아서 그 일을 한다.
 
 ---
 
@@ -64,7 +64,7 @@ stt 는 강어귀다. 바깥에서 흘러온 물이 처음 닿는 자리이고, 
 
 ### 3.1 `STTEvent` → 테이블 `stt_events` — 통화의 시작과 끝
 
-통화 한 건은 행 두 개로 남는다. `S` 한 줄, `E` 한 줄. 로컬 DB 의 통화 86건이 전부 `S,E` 쌍이었다.
+통화 한 건은 행 두 개로 남는다. `S` 한 줄, `E` 한 줄. 로컬 DB 에서 최근 통화 다섯 건을 열어 보니 전부 `S,E` 쌍이었다.
 
 | 컬럼 | 의미 | 실데이터 예 |
 |---|---|---|
@@ -161,7 +161,7 @@ SELECT (SELECT COUNT(DISTINCT call_id) FROM stt_events)   AS calls_with_events,
 | POST | `/api/stt/event` | permitAll | 통화 시작/종료 |
 | POST | `/api/stt/message` | permitAll | 발화 1문장 |
 
-인증·권한 글의 자가진단 3번, "`/api/stt/message` 가 permitAll 인데 왜 안전한가"의 현장이 여기다. 외부 교환기는 JWT 를 보낼 줄 모른다. 대신 이 엔드포인트는 저장만 하고 아무것도 돌려주지 않으며, 운영에서는 망 분리와 IP 제한이 그 앞을 지킨다.
+인증·권한 글의 자가진단 3번, "`/api/stt/message` 가 permitAll 인데 왜 안전한가"의 현장이 여기다. 외부 교환기는 JWT 를 보낼 줄 모른다. 대신 이 엔드포인트는 받은 것을 저장할 뿐 데이터를 돌려주지 않고(응답은 처리 결과 코드뿐이다), 운영에서는 망 분리와 IP 제한이 그 앞을 지킨다.
 
 ### 5.2 `receiveSTTMessage` 따라가기 (78~190줄)
 
@@ -221,7 +221,7 @@ React 쪽 진입점은 `web-react/src/services/stt.service.ts` 이고, 그걸 �
 
 169줄 주석에 날짜가 있다. 2026-05-28. 상담사 서른 명이 동시에 발화를 저장하는 상황에서 커밋이 60초 넘게 걸리고 HikariCP 커넥션이 새는 일이 있었다. 원인은 `STTMessage` 의 보조 인덱스 여러 개와 바깥 트랜잭션의 커밋 단계가 잠금을 두고 다툰 것이었고, 해결은 바깥 트랜잭션을 걷어 내고 repository 의 짧은 자체 트랜잭션에 맡기는 것이었다. 누군가 그날 애너테이션 한 줄을 뗐고 그 이유를 주석으로 남겼다.
 
-> 🔴 **`saveSTTMessage` 에 `@Transactional` 을 다시 붙이지 않는다.** CRITICAL 7 "모든 `@Transactional` 에 timeout" 과 8 "readOnly 안에서 외부 I/O 금지" 가 생긴 배경 중 하나가 이 사건이다. 규칙이 왜 있는지 궁금해지면 이 주석으로 돌아온다.
+> 🔴 **`saveSTTMessage` 에 `@Transactional` 을 다시 붙이지 않는다.** CRITICAL 7 "모든 `@Transactional` 에 timeout" 과 8 "readOnly 안에서 외부 I/O 금지" 가 겨누는 것이 바로 이런 커밋 지연이다. 규칙이 왜 있는지 궁금해지면 이 주석으로 돌아온다.
 
 ### 같은 파일의 나머지는 언제 보나
 
@@ -236,7 +236,7 @@ React 쪽 진입점은 `web-react/src/services/stt.service.ts` 이고, 그걸 �
 
 ## 7. ingest — `SttIngestFilter` (183줄, 전부 읽기)
 
-AI 소프트폰을 쓰면 같은 상담사 내선으로 STT 가 두 벌 들어온다. 같은 강으로 물이 두 줄기 흘러드는데 한 줄기는 맑고 한 줄기는 흙탕이다.
+AI 소프트폰을 쓰면 같은 상담사 내선으로 STT 가 두 벌 들어온다. 한 줄기는 맑고 한 줄기는 흙탕인데, 둘 다 같은 강어귀로 흘러든다.
 
 | 출처 | `call_id` 모양 | 품질 | 처리 |
 |---|---|---|---|
@@ -287,7 +287,7 @@ MessageRoutingService.broadcastRealtimeFirst()
 
 ## 9. 보너스 — `counseltype` (35개)
 
-"AI 호출이 붙으면 모듈이 어떻게 달라지나"를 보는 두 번째 표본이다. 15분이면 된다.
+두 번째 표본이다. stt 와 크기가 비슷한데 AI 자동 분류가 붙어 있어서, 둘을 나란히 놓으면 차이가 바로 보인다. 15분이면 된다.
 
 테이블 `counsel_type` 은 로컬에 92행이 있고 `parent_id`, `depth`, `path = STD-1 …` 로 트리를 이룬다. 일반 CRUD 위에 `reclassify`(AI 재분류 실행)와 `merge` 와 `similarity-groups`(유사 이름 묶기)가 얹혀 있고, 그래서 `service/impl/` 에 `CounselTypeRaceSafeWriter` 와 `StandardCatalogResolver` 와 `ReclassificationRunServiceImpl` 같은 실행 이력·동시성 방어가 추가로 생겼다. 인가는 클래스 레벨 `@PreAuthorize("isAuthenticated()")` 하나뿐인데, 이것이 "role 하드코딩 금지"(CRITICAL 19)의 모범 사례다.
 
